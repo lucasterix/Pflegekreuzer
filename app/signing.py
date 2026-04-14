@@ -2,6 +2,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 from typing import Optional
+from app.file_utils import SecureFileHandler
 
 
 CERT_PATH = Path("crypto/test-cert.pem")   # <-- eigene Zertifikate möglich
@@ -21,6 +22,14 @@ def sign_edifact(
     ✦ Genau dieses Format erwartet TA3 gemäß GKV-Spezifikation
     ✦ Wenn Schlüssel/Zertifikat fehlen → EDIFACT wird unsigniert zurückgegeben
     """
+
+    # Pfad-Validierung für Sicherheit
+    try:
+        SecureFileHandler.validate_path(Path("crypto"), cert_path.name)
+        SecureFileHandler.validate_path(Path("crypto"), key_path.name)
+    except ValueError as e:
+        print(f"[SIGNING] ❌ Pfad-Validierung fehlgeschlagen: {e}")
+        return edifact_bytes
 
     if not cert_path.exists() or not key_path.exists():
         print("[SIGNING] ❗ Kein Zertifikat/Key gefunden → Datei bleibt UNSIGNIERT.")

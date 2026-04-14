@@ -7,7 +7,7 @@ from fastapi.responses import RedirectResponse
 from .db import Base, engine, SessionLocal
 from .models import hilfsmittel, kostentraeger, patient, abrechnung, settings  # noqa: F401
 from .models.hilfsmittel import PflegeHilfsmittel
-from .routes import ui
+from .routes import ui, auth
 from .routes.bank_import import router as bank_router
 from .fixtures import PFLEGEHILFSMITTEL_DEFAULTS
 from .ke0_import import import_ke0_directory
@@ -114,5 +114,6 @@ async def auth_middleware(request: Request, call_next):
 #   Static & Routen
 # ==============================
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.include_router(auth.router)
 app.include_router(ui.router)
 app.include_router(bank_router)

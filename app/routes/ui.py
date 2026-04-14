@@ -18,6 +18,7 @@ from fastapi.responses import (
     HTMLResponse,
 )
 from fastapi.templating import Jinja2Templates
+from app.file_utils import SecureFileHandler
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from decimal import Decimal
@@ -328,8 +329,7 @@ async def upload_unterschriebener_antrag(
     target_path = base_dir / "Unterschriebener_Antrag.pdf"
 
     data = await antrag_pdf.read()
-    with target_path.open("wb") as f:
-        f.write(data)
+    SecureFileHandler.safe_write_file(target_path, data)
 
     # Pfad in der DB merken (voller Pfad als String)
     patient.unterschriebener_antrag = str(target_path)
@@ -684,8 +684,7 @@ def generate_antrag_kasse_patient(
     file_path = export_dir / filename
 
     pdf_bytes = pdf_buf.getvalue()
-    with file_path.open("wb") as f:
-        f.write(pdf_bytes)
+    SecureFileHandler.safe_write_file(file_path, pdf_bytes)
 
     # Für den Download noch einmal als Stream zurückgeben
     pdf_stream = BytesIO(pdf_bytes)
@@ -707,46 +706,6 @@ def login_form(request: Request):
         {"request": request, "error": error},
     )
 
-
-@router.post("/login")
-async def login_submit(
-    request: Request,
-    username: str = Form(...),
-    password: str = Form(...),
-):
-    u = (username or "").strip()
-    p = (password or "").strip()
-
-    if u == APP_LOGIN_USER and verify_password(p, APP_LOGIN_PASSWORD):
-        resp = RedirectResponse(url="/", status_code=303)
-        token = create_signed_cookie("ok", APP_AUTH_COOKIE_SECRET)
-        resp.set_cookie(
-            APP_AUTH_COOKIE_NAME,
-            token,
-            max_age=60 * 60 * 8,
-            httponly=True,
-            secure=SESSION_COOKIE_SECURE,
-            samesite=SESSION_COOKIE_SAMESITE,
-        )
-        return resp
-
-    # Falsche Logindaten → Fehler anzeigen
-    return templates.TemplateResponse(
-        "login.html",
-        {
-            "request": request,
-            "error": "Benutzername oder Passwort ist falsch.",
-        },
-        status_code=401,
-    )
-
-
-@router.get("/logout")
-def logout():
-    resp = RedirectResponse(url="/login", status_code=303)
-    # Cookie löschen
-    resp.delete_cookie(APP_AUTH_COOKIE_NAME)
-    return resp
 
 @router.get("/patients/{patient_id}/unterschrift_eins")
 def generate_unterschrift_eins_patient(
