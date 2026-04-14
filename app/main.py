@@ -11,20 +11,13 @@ from .routes import ui
 from .routes.bank_import import router as bank_router
 from .fixtures import PFLEGEHILFSMITTEL_DEFAULTS
 from .ke0_import import import_ke0_directory
+from .config import APP_AUTH_COOKIE_NAME, AUTH_COOKIE_NAME
 
 
 # ==============================
 #   Login / Auth
 # ==============================
-
-# App-Login (globaler Zugang)
-APP_LOGIN_USER = "abrechnung@froehlichdienste.de"
-APP_LOGIN_PASSWORD = "FrohZeit123"
-APP_AUTH_COOKIE_NAME = "app_auth"
-
-# Passwort für die Konfig-Seite (separat)
-CONFIG_PASSWORD = "Einheitsfront1A+"
-AUTH_COOKIE_NAME = "cfg_auth"
+# Login-User, Passwort und Cookie-Namen werden aus Umgebungsvariablen geladen.
 
 
 def _remove_obsolete_hilfsmittel(db):

@@ -56,6 +56,15 @@ from ..pdf_unterschrift_eins import render_unterschrift_eins
 from app.pdf_signature import extract_signature_from_pflegeantrag
 from app.pdf_tools import render_anlage3, render_unterschrift_zwei
 from app.pdf_combine import combine_pdfs
+from ..config import (
+    APP_LOGIN_USER,
+    APP_LOGIN_PASSWORD,
+    CONFIG_PASSWORD,
+    APP_AUTH_COOKIE_NAME,
+    AUTH_COOKIE_NAME,
+    SESSION_COOKIE_SECURE,
+    SESSION_COOKIE_SAMESITE,
+)
 
 # ==============================
 #   Tarifkennzeichen-Defaults (TA3)
@@ -68,9 +77,6 @@ TARIFKENNZEICHEN_DEFAULTS: dict[str, str] = {
     "NW": "08000",  # Nordrhein-Westfalen
     "BE": "23000",  # Berlin
 }
-
-CONFIG_PASSWORD = "Einheitsfront1A+"
-AUTH_COOKIE_NAME = "cfg_auth"
 
 # Dummy-Mail für Testbetrieb (falls keine echte Annahmestellen-Mail hinterlegt ist)
 DUMMY_KASSEN_EMAIL = "dummy-kasse@example.org"
@@ -103,10 +109,6 @@ NS_ABR = "http://www.gkv-datenaustausch.de/XMLSchema/PFL_ABR/2.2"
 ET.register_namespace("dat", NS_DAT)
 ET.register_namespace("bas", NS_BAS)
 ET.register_namespace("abr", NS_ABR)
-
-APP_LOGIN_USER = "abrechnung@froehlichdienste.de"
-APP_LOGIN_PASSWORD = "FrohZeit123"
-APP_AUTH_COOKIE_NAME = "app_auth"
 
 def get_abrechnung_export_dir(abrechnung: Abrechnung) -> Path:
     """
@@ -238,7 +240,7 @@ def update_patient(
     kasse_id: str = Form(""),
     db: Session = Depends(get_db),
 ):
-    patient = db.query(Patient).get(patient_id)
+    patient = db.get(Patient, patient_id)
     if not patient:
         return RedirectResponse(url="/patients", status_code=303)
 
@@ -269,7 +271,7 @@ def delete_patient(
     patient_id: int,
     db: Session = Depends(get_db),
 ):
-    patient = db.query(Patient).get(patient_id)
+    patient = db.get(Patient, patient_id)
     if not patient:
         return RedirectResponse(url="/patients", status_code=303)
 
@@ -303,7 +305,7 @@ async def upload_unterschriebener_antrag(
       exports/<id>_<Name>/Unterschriebener_Antrag.pdf
     und hinterlegt den vollen Pfad in patient.unterschriebener_antrag.
     """
-    patient = db.query(Patient).get(patient_id)
+    patient = db.get(Patient, patient_id)
     if not patient:
         return HTMLResponse("Patient nicht gefunden.", status_code=404)
 
@@ -493,7 +495,7 @@ def generate_pflegeantrag(
     patient_id: int,
     db: Session = Depends(get_db),
 ):
-    patient = db.query(Patient).get(patient_id)
+    patient = db.get(Patient, patient_id)
     if not patient:
         return RedirectResponse(url="/patients", status_code=303)
 
@@ -548,7 +550,7 @@ def generate_antrag_kasse(
     Wird aus abrechnungen.html über den Button "Antrag Krankenkasse generieren"
     aufgerufen, inkl. Beratungsgesprächs-Datum & -Mitarbeiter.
     """
-    abrechnung = db.query(Abrechnung).get(abrechnung_id)
+    abrechnung = db.get(Abrechnung, abrechnung_id)
     if not abrechnung:
         raise HTTPException(status_code=404, detail="Abrechnung nicht gefunden")
 
@@ -615,7 +617,7 @@ def generate_antrag_kasse_patient(
     aus dem Frontend und werden zusätzlich im Patienten-Export-Ordner
     archiviert.
     """
-    patient = db.query(Patient).get(patient_id)
+    patient = db.get(Patient, patient_id)
     if not patient:
         return RedirectResponse(url="/patients", status_code=303)
 
@@ -710,13 +712,14 @@ async def login_submit(
 
     if u == APP_LOGIN_USER and p == APP_LOGIN_PASSWORD:
         resp = RedirectResponse(url="/", status_code=303)
-        # 8 Stunden gültig, HTTP-only
+        # 8 Stunden gültig, sicherer Cookie
         resp.set_cookie(
             APP_AUTH_COOKIE_NAME,
             "ok",
             max_age=60 * 60 * 8,
             httponly=True,
-            samesite="lax",
+            secure=SESSION_COOKIE_SECURE,
+            samesite=SESSION_COOKIE_SAMESITE,
         )
         return resp
 
@@ -752,7 +755,7 @@ def generate_unterschrift_eins_patient(
     """
     from pathlib import Path as _Path
 
-    patient = db.query(Patient).get(patient_id)
+    patient = db.get(Patient, patient_id)
     if not patient:
         raise HTTPException(status_code=404, detail="Patient nicht gefunden")
 
@@ -833,7 +836,7 @@ def download_archived_antrag_inkl_unterschrift(
     aus dem Export-Ordner des Patienten.
     Kein Neurendern, nur Download der vorhandenen Datei.
     """
-    patient = db.query(Patient).get(patient_id)
+    patient = db.get(Patient, patient_id)
     if not patient:
         raise HTTPException(status_code=404, detail="Patient nicht gefunden.")
 
@@ -890,7 +893,7 @@ def generate_antrag_komplett(
       - Seite 1: Antrag Krankenkasse (antrag.pdf)
       - Seite 2: Beratungsnachweis/Unterschrift (mit Signatur)
     """
-    patient = db.query(Patient).get(patient_id)
+    patient = db.get(Patient, patient_id)
     if not patient:
         return RedirectResponse(url="/patients", status_code=303)
 
@@ -1014,7 +1017,7 @@ def storno_abrechnung(
     Die Daten bleiben im Archiv sichtbar, erscheinen aber nicht mehr
     in der laufenden Monatsübersicht / beim Versand.
     """
-    abr = db.query(Abrechnung).get(abrechnung_id)
+    abr = db.get(Abrechnung, abrechnung_id)
     if not abr:
         return RedirectResponse(
             url=f"/abrechnungen?monat={monat}", status_code=303
@@ -1060,7 +1063,8 @@ async def config_login_submit(
             "ok",
             max_age=60 * 60 * 8,  # 8 Stunden
             httponly=True,
-            samesite="lax",
+            secure=SESSION_COOKIE_SECURE,
+            samesite=SESSION_COOKIE_SAMESITE,
         )
         return resp
 
@@ -1086,7 +1090,7 @@ def create_abrechnung(
     beratung_mitarbeiter: str = Form(""),
     db: Session = Depends(get_db),
 ):
-    patient = db.query(Patient).get(patient_id)
+    patient = db.get(Patient, patient_id)
     if not patient:
         return RedirectResponse(url="/abrechnungen", status_code=303)
 
@@ -1142,7 +1146,7 @@ def create_abrechnung(
         if qty_int <= 0:
             continue
 
-        hm = db.query(PflegeHilfsmittel).get(hm_id)
+        hm = db.get(PflegeHilfsmittel, hm_id)
         if not hm:
             continue
 
@@ -1210,13 +1214,13 @@ def export_abrechnung_rechnung(
     abrechnung_id: int,
     db: Session = Depends(get_db),
 ):
-    abrechnung = db.query(Abrechnung).get(abrechnung_id)
+    abrechnung = db.get(Abrechnung, abrechnung_id)
     if not abrechnung:
         return RedirectResponse(url="/abrechnungen", status_code=303)
 
     patient = abrechnung.patient
     kasse = abrechnung.kasse
-    cfg = db.query(Einstellungen).get(1)
+    cfg = db.get(Einstellungen, 1)
 
     # === Patient- & Kassen-Daten ============================================
     kasse_address = ""
@@ -1355,7 +1359,7 @@ def export_abrechnung_xml(
     abrechnung_id: int,
     db: Session = Depends(get_db),
 ):
-    abrechnung = db.query(Abrechnung).get(abrechnung_id)
+    abrechnung = db.get(Abrechnung, abrechnung_id)
     if not abrechnung:
         return RedirectResponse(url="/abrechnungen", status_code=303)
 
@@ -1363,7 +1367,7 @@ def export_abrechnung_xml(
     kasse = abrechnung.kasse
     positionen = abrechnung.positionen
 
-    cfg = db.query(Einstellungen).get(1)
+    cfg = db.get(Einstellungen, 1)
 
     errors: List[str] = []
 
@@ -1580,7 +1584,7 @@ def _sende_abrechnung_per_mail(
     if abrechnung.gesendet_am is not None:
         return True, None
 
-    cfg = db.query(Einstellungen).get(1)
+    cfg = db.get(Einstellungen, 1)
     if not cfg:
         return False, (
             "Es ist noch keine Konfiguration hinterlegt. "
@@ -1892,7 +1896,7 @@ def absenden_send_single(
     monat: str = Form(...),
     db: Session = Depends(get_db),
 ):
-    abrechnung = db.query(Abrechnung).get(abrechnung_id)
+    abrechnung = db.get(Abrechnung, abrechnung_id)
     if not abrechnung:
         error = f"Abrechnung {abrechnung_id} wurde nicht gefunden."
         url = f"/absenden?monat={monat}&error={urllib.parse.quote(error)}"
@@ -1948,7 +1952,7 @@ def absenden_send_all(
 # ==============================
 @router.get("/config")
 def get_config(request: Request, db: Session = Depends(get_db)):
-    cfg = db.query(Einstellungen).get(1)
+    cfg = db.get(Einstellungen, 1)
 
     if not cfg:
         cfg = Einstellungen(
@@ -2006,7 +2010,7 @@ def save_config(
     bank_iban: str = Form(""),
     db: Session = Depends(get_db),
 ):
-    cfg = db.query(Einstellungen).get(1)
+    cfg = db.get(Einstellungen, 1)
     if not cfg:
         cfg = Einstellungen(id=1)
         db.add(cfg)
@@ -2110,7 +2114,7 @@ def archiv_patient_view(
     monat: Optional[str] = None,
     db: Session = Depends(get_db),
 ):
-    patient = db.query(Patient).get(patient_id)
+    patient = db.get(Patient, patient_id)
 
     # Abrechnungen laden
     abrechnungen_q = (
@@ -2137,7 +2141,7 @@ def archiv_patient_view(
     #   Abrechnungs-spezifische Dateien
     # ============================
     dateien: dict[int, dict] = {}
-    cfg = db.query(Einstellungen).get(1)
+    cfg = db.get(Einstellungen, 1)
     verfahrenskennung = cfg.verfahrenskennung or "TPFL0" if cfg else "TPFL0"
 
     for a in abrechnungen:
@@ -2267,11 +2271,11 @@ def download_leistungsnachweis(
     Original-Kassenversion des Leistungsnachweises ausliefern:
     <transfername>_Leistungsnachweis.pdf
     """
-    abrechnung = db.query(Abrechnung).get(abrechnung_id)
+    abrechnung = db.get(Abrechnung, abrechnung_id)
     if not abrechnung:
         return RedirectResponse(url="/archiv", status_code=303)
 
-    cfg = db.query(Einstellungen).get(1)
+    cfg = db.get(Einstellungen, 1)
     verfahrenskennung = cfg.verfahrenskennung or "TPFL0" if cfg else "TPFL0"
 
     export_dir = get_abrechnung_export_dir(abrechnung)
@@ -2301,11 +2305,11 @@ def download_leistungsnachweis_komplett(
     Kombinierte Version (Empfang + Unterschrift_zwei) ausliefern:
     <transfername>_Leistungsnachweis_komplett.pdf
     """
-    abrechnung = db.query(Abrechnung).get(abrechnung_id)
+    abrechnung = db.get(Abrechnung, abrechnung_id)
     if not abrechnung:
         return RedirectResponse(url="/archiv", status_code=303)
 
-    cfg = db.query(Einstellungen).get(1)
+    cfg = db.get(Einstellungen, 1)
     verfahrenskennung = cfg.verfahrenskennung or "TPFL0" if cfg else "TPFL0"
 
     export_dir = get_abrechnung_export_dir(abrechnung)
@@ -2335,7 +2339,7 @@ def download_archived_antrag_kasse(
     Liefert den (zuletzt erzeugten) archivierten Antrag_Krankenkasse_*.pdf
     aus dem Patienten-Export-Ordner.
     """
-    patient = db.query(Patient).get(patient_id)
+    patient = db.get(Patient, patient_id)
     if not patient:
         return RedirectResponse(url="/archiv", status_code=303)
 
@@ -2442,11 +2446,11 @@ def download_begleitzettel(
     Erwartet, dass der Begleitzettel im gleichen Export-Ordner liegt
     wie XML/AUF (Name: <transfername>_Begleitzettel.pdf).
     """
-    abrechnung = db.query(Abrechnung).get(abrechnung_id)
+    abrechnung = db.get(Abrechnung, abrechnung_id)
     if not abrechnung:
         return RedirectResponse(url="/archiv", status_code=303)
 
-    cfg = db.query(Einstellungen).get(1)
+    cfg = db.get(Einstellungen, 1)
     verfahrenskennung = cfg.verfahrenskennung or "TPFL0" if cfg else "TPFL0"
 
     export_dir = get_abrechnung_export_dir(abrechnung)
@@ -2489,7 +2493,7 @@ def leistung_nachweise_view(
         .all()
     )
 
-    cfg = db.query(Einstellungen).get(1)
+    cfg = db.get(Einstellungen, 1)
     verfahrenskennung = cfg.verfahrenskennung or "TPFL0" if cfg else "TPFL0"
 
     abr_ln_list = []
@@ -2534,7 +2538,7 @@ async def upload_leistungsnachweis(
     5. Alles zu <transfername>_Leistungsnachweis_komplett.pdf kombinieren
     """
     # --- 1️⃣ Abrechnung holen ---
-    abrechnung = db.query(Abrechnung).get(abrechnung_id)
+    abrechnung = db.get(Abrechnung, abrechnung_id)
     if not abrechnung:
         return RedirectResponse(url="/leistungsnachweise", status_code=303)
 
@@ -2547,7 +2551,7 @@ async def upload_leistungsnachweis(
     if "pdf" not in content_type and not (ln_pdf.filename or "").lower().endswith(".pdf"):
         return HTMLResponse("Bitte eine PDF-Datei hochladen.", status_code=400)
 
-    cfg = db.query(Einstellungen).get(1)
+    cfg = db.get(Einstellungen, 1)
     verfahrenskennung = cfg.verfahrenskennung or "TPFL0" if cfg else "TPFL0"
 
     export_dir = get_abrechnung_export_dir(abrechnung)
@@ -2691,11 +2695,11 @@ def download_leistungsnachweis_komplett(
     """
     Kombinierte Version (Empfang + Unterschrift_zwei) ausliefern.
     """
-    abrechnung = db.query(Abrechnung).get(abrechnung_id)
+    abrechnung = db.get(Abrechnung, abrechnung_id)
     if not abrechnung:
         return RedirectResponse(url="/archiv", status_code=303)
 
-    cfg = db.query(Einstellungen).get(1)
+    cfg = db.get(Einstellungen, 1)
     verfahrenskennung = cfg.verfahrenskennung or "TPFL0" if cfg else "TPFL0"
 
     export_dir = get_abrechnung_export_dir(abrechnung)
