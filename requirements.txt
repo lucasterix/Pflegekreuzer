@@ -13,3 +13,4 @@ Pillow
 python-dotenv
 lxml
 pdf2image
+requests
