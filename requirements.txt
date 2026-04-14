@@ -14,3 +14,5 @@ python-dotenv
 lxml
 pdf2image
 requests
+google-auth
+google-api-python-client
