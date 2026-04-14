@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- bearbeitet mit XMLSpy v2025 (x64) (https://www.altova.com) von GKV-Spitzenverband (GKV-Spitzenverband) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:dat="http://www.gkv-datenaustausch.de/XMLSchema/PFL_DAT/2.2" xmlns:bas="http://www.gkv-datenaustausch.de/XMLSchema/PFL_basis/2.2" xmlns:feh="http://www.gkv-datenaustausch.de/XMLSchema/PFL_FEH/2.2" xmlns:abr="http://www.gkv-datenaustausch.de/XMLSchema/PFL_ABR/2.2" targetNamespace="http://www.gkv-datenaustausch.de/XMLSchema/PFL_DAT/2.2" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.2.0">
+	<xs:import namespace="http://www.gkv-datenaustausch.de/XMLSchema/PFL_basis/2.2" schemaLocation="PFL_basis_2.2.0.xsd"/>
+	<xs:import namespace="http://www.gkv-datenaustausch.de/XMLSchema/PFL_FEH/2.2" schemaLocation="PFL_FEH_2.2.0.xsd"/>
+	<xs:import namespace="http://www.gkv-datenaustausch.de/XMLSchema/PFL_ABR/2.2" schemaLocation="PFL_ABR_2.2.0.xsd"/>
+	<xs:element name="Nutzdaten">
+		<xs:annotation>
+			<xs:documentation>Root</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Header" type="bas:Header_Ctp">
+					<xs:annotation>
+						<xs:documentation>Header-Informationen zur Datenlieferung</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:choice>
+					<xs:element name="Abrechnungsnachricht" type="abr:Abr_Ctp"/>
+					<xs:element name="Fehlernachricht" type="feh:Feh_Ctp"/>
+				</xs:choice>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

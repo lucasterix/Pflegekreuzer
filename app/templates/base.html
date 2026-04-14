@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Pflegehilfsmittel Abrechnung{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+
+  <style>
+    body {
+      margin:0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:#f3f4f6;
+      color:#111827;
+    }
+
+    .app-shell {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 12px 16px 28px;
+    }
+
+    header.app-header {
+      position:relative;
+      padding-bottom:8px;
+      border-bottom:1px solid #e5e7eb;
+      margin-bottom:18px;
+    }
+
+    .brand-row {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    .brand-left {
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:4px 0;
+    }
+
+    .brand-left img {
+      display:block;
+    }
+
+    .brand-left h1 {
+      margin:0;
+      font-size:1.6rem;
+      line-height:1.1;
+    }
+
+    .brand-sub {
+      margin-top:2px;
+      font-size:0.85rem;
+      color:#6b7280;
+    }
+
+    .brand-right img {
+      height:70px;
+      width:auto;
+      opacity:0.92;
+    }
+
+    nav.main-nav {
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      font-size:0.95rem;
+    }
+
+    nav.main-nav a {
+      text-decoration:none;
+      color:#374151;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid transparent;
+      background:transparent;
+      transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+    }
+
+    nav.main-nav a:hover {
+      background:#e5f0ff;
+      color:#1d4ed8;
+      border-color:#bfdbfe;
+      transform:translateY(-1px);
+    }
+
+    main {
+      margin-top:16px;
+    }
+
+    @media (max-width: 720px) {
+      .brand-row {
+        flex-direction:column;
+        align-items:flex-start;
+      }
+      .brand-right {
+        align-self:flex-end;
+      }
+      .brand-left h1 {
+        font-size:1.35rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="brand-row">
+        <!-- Linke Seite: Kreuzer-Logo + Titel -->
+        <div class="brand-left">
+          <img src="/static/schiff.png"
+               alt="Logo Kreuzer"
+               style="height:46px; width:auto; opacity:0.95;">
+          <div>
+            <h1>der große Pflegehilfsmittel-Kreuzer</h1>
+            <div class="brand-sub">Steuermann für Kassen, Patienten & Abrechnung</div>
+          </div>
+        </div>
+
+        <!-- Rechte Seite: Kleeblatt -->
+        <div class="brand-right">
+          <img src="/static/logo_klein.png"
+               alt="Kleeblatt-Logo">
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="main-nav">
+        <a href="/">Start</a>
+        <a href="/hilfsmittel">Pflegehilfsmittel</a>
+        <a href="/kassen">Kassen</a>
+        <a href="/patients">Patienten</a>
+        <a href="/abrechnungen">Abrechnungen</a>
+        <a href="/absenden">Absenden</a>
+        <a href="/leistungsnachweise">Leistungsnachweise</a>
+        <a href="/archiv">Archiv</a>
+        <a href="/config">Konfiguration</a>
+      </nav>
+    </header>
+
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

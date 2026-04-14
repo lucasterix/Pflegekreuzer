@@ -1,0 +1,537 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .page-header {
+    margin-bottom:1rem;
+  }
+  .page-header h2 {
+    margin:0 0 4px 0;
+    font-size:1.7rem;
+  }
+  .page-header small {
+    color:#4a5568;
+    font-size:0.9rem;
+  }
+
+  .config-grid {
+    display:grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap:20px;
+    align-items:flex-start;
+  }
+  @media (max-width: 960px) {
+    .config-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .card {
+    background:#ffffff;
+    border-radius:10px;
+    border:1px solid #e2e8f0;
+    padding:16px 18px;
+    box-shadow:0 2px 4px rgba(15,23,42,0.05);
+    margin-bottom:1rem;
+  }
+
+  .card h3 {
+    margin-top:0;
+    margin-bottom:0.4rem;
+    font-size:1.2rem;
+  }
+  .card-subtitle {
+    margin:0 0 1rem;
+    font-size:0.9rem;
+    color:#64748b;
+  }
+
+  .form-row {
+    margin-bottom:0.75rem;
+  }
+  .form-row label {
+    font-size:0.9rem;
+    color:#334155;
+    display:block;
+    margin-bottom:0.2rem;
+  }
+  .form-row input[type="text"],
+  .form-row input[type="email"],
+  .form-row input[type="password"],
+  .form-row input[type="number"],
+  .form-row select {
+    width:100%;
+    max-width:380px;
+    padding:7px 9px;
+    border-radius:6px;
+    border:1px solid #cbd5e1;
+    font-size:0.95rem;
+  }
+  .form-row small.hint {
+    display:block;
+    margin-top:2px;
+    font-size:0.8rem;
+    color:#64748b;
+  }
+  .form-row input:focus,
+  .form-row select:focus {
+    outline:none;
+    border-color:#2563eb;
+    box-shadow:0 0 0 1px rgba(37,99,235,0.25);
+  }
+
+  .ik-input:invalid {
+    border-color:#e53e3e;
+    background:#fff5f5;
+  }
+  .ik-input:valid {
+    border-color:#38a169;
+    background:#f0fff4;
+  }
+
+  .fieldset-group {
+    margin-bottom:1rem;
+  }
+
+  .section-title {
+    font-weight:600;
+    margin:0 0 0.4rem;
+    font-size:1rem;
+  }
+
+  .checkbox-row {
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:0.9rem;
+    color:#334155;
+  }
+
+  .btn-primary {
+    display:inline-block;
+    padding:9px 16px;
+    border-radius:999px;
+    background:#2563eb;
+    color:#fff;
+    border:none;
+    font-size:0.95rem;
+    cursor:pointer;
+    margin-top:0.5rem;
+  }
+  .btn-primary:hover {
+    background:#1d4ed8;
+  }
+
+  .hint-block {
+    font-size:0.85rem;
+    color:#4a5568;
+    margin-top:0.2rem;
+  }
+</style>
+
+<div class="page-header">
+  <h2>Konfiguration Leistungserbringer</h2>
+  <small>Stammdaten, Abrechnungseinstellungen, AUF-Parameter und SMTP-Zugang verwalten.</small>
+</div>
+
+<form method="post" action="/config" id="config-form">
+
+  <div class="config-grid">
+
+    <!-- Linke Spalte: Stammdaten + Abrechnung + Bank -->
+    <div>
+
+      <!-- Stammdaten -->
+      <section class="card">
+        <h3>Stammdaten</h3>
+        <p class="card-subtitle">Grunddaten deines Betriebs, wie sie in XML und Rechnungen erscheinen.</p>
+
+        <div class="form-row">
+          <label for="cfg-name">Name des Betriebs</label>
+          <input id="cfg-name" type="text" name="name" value="{{ cfg.name or '' }}">
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-strasse">Straße</label>
+          <input id="cfg-strasse" type="text" name="strasse" value="{{ cfg.strasse or '' }}">
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-plz">PLZ</label>
+          <input id="cfg-plz" type="text" name="plz" value="{{ cfg.plz or '' }}">
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-ort">Ort</label>
+          <input id="cfg-ort" type="text" name="ort" value="{{ cfg.ort or '' }}">
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-ik">IK (9-stellig, nur Ziffern)</label>
+          <input
+            id="cfg-ik"
+            type="text"
+            name="ik"
+            required
+            value="{{ cfg.ik or '' }}"
+            maxlength="9"
+            minlength="9"
+            pattern="[0-9]{9}"
+            inputmode="numeric"
+            autocomplete="off"
+            class="ik-input"
+          >
+          <small class="hint">
+            Das Institutionskennzeichen muss genau 9 Ziffern haben (z.&nbsp;B. 023134512).
+          </small>
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-kim">KIM-/Absenderadresse (wird im XML als KIM_Mailadresse verwendet)</label>
+          <input id="cfg-kim"
+                 type="email"
+                 name="kim_adresse"
+                 value="{{ cfg.kim_adresse or cfg.email_absender or '' }}"
+                 placeholder="z.B. abrechnung@deinbetrieb.de">
+        </div>
+      </section>
+
+      <!-- Abrechnung -->
+      <section class="card">
+        <h3>Abrechnung</h3>
+        <p class="card-subtitle">Einstellungen für TA3, Tarifkennzeichen und Steuer.</p>
+
+        <div class="form-row">
+          <label for="cfg-bundesland">Bundesland</label>
+          <select id="cfg-bundesland" name="bundesland">
+            <option value="">-- bitte wählen --</option>
+            {% for code, label in [
+              ('NI','Niedersachsen'),
+              ('NW','Nordrhein-Westfalen'),
+              ('BY','Bayern'),
+              ('BE','Berlin'),
+              ('BW','Baden-Württemberg'),
+              ('HE','Hessen'),
+            ] %}
+              <option value="{{ code }}" {% if cfg.bundesland == code %}selected{% endif %}>
+                {{ label }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-abrcode">Abrechnungscode (TA3, z.B. 19 für Pflegehilfsmittel)</label>
+          <input id="cfg-abrcode" type="text" name="abrechnungscode" value="{{ cfg.abrechnungscode or '19' }}">
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-tarif">Tarifkennzeichen (TA3, 5-stellig)</label>
+          <select id="cfg-tarif" name="tarifkennzeichen">
+            <option value="">
+              -- automatisch aus Bundesland (Standardtarif) übernehmen --
+            </option>
+
+            <option value="01000" {% if cfg.tarifkennzeichen == '01000' %}selected{% endif %}>
+              01000 – Baden-Württemberg (Standardtarif)
+            </option>
+            <option value="02000" {% if cfg.tarifkennzeichen == '02000' %}selected{% endif %}>
+              02000 – Bayern (Standardtarif)
+            </option>
+            <option value="06000" {% if cfg.tarifkennzeichen == '06000' %}selected{% endif %}>
+              06000 – Hessen (Standardtarif)
+            </option>
+            <option value="07000" {% if cfg.tarifkennzeichen == '07000' %}selected{% endif %}>
+              07000 – Niedersachsen (Standardtarif)
+            </option>
+            <option value="08000" {% if cfg.tarifkennzeichen == '08000' %}selected{% endif %}>
+              08000 – Nordrhein-Westfalen (Standardtarif)
+            </option>
+            <option value="23000" {% if cfg.tarifkennzeichen == '23000' %}selected{% endif %}>
+              23000 – Berlin (Standardtarif)
+            </option>
+          </select>
+          <small class="hint">
+            Wenn hier nichts ausgewählt wird, wird beim Speichern automatisch ein
+            Standardtarifkennzeichen aus dem Bundesland abgeleitet (z.&nbsp;B. NI → 07000).
+          </small>
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-verf">Verfahrenskennung</label>
+          <select id="cfg-verf" name="verfahrenskennung">
+            <option value="TPFL0" {% if cfg.verfahrenskennung == 'TPFL0' %}selected{% endif %}>TPFL0 (Test)</option>
+            <option value="EPFL0" {% if cfg.verfahrenskennung == 'EPFL0' %}selected{% endif %}>EPFL0 (Echt)</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-ustpflicht">Umsatzsteuer berechnen?</label>
+          <select id="cfg-ustpflicht" name="ust_pflichtig">
+            <option value="nein"
+              {% if cfg.ust_pflichtig is not none and not cfg.ust_pflichtig %}selected{% endif %}>
+              Nein
+            </option>
+            <option value="ja"
+              {% if cfg.ust_pflichtig is none or cfg.ust_pflichtig %}selected{% endif %}>
+              Ja
+            </option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-ustsatz">USt-Satz (%)</label>
+          <input id="cfg-ustsatz" type="text" name="ust_satz" value="{{ cfg.ust_satz or '19' }}">
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-medium">Übermittlungsmedium</label>
+          <select id="cfg-medium" name="uebermittlungsmedium">
+            <option value="2"
+              {% if cfg.uebermittlungsmedium == '2' or not cfg.uebermittlungsmedium %}selected{% endif %}>
+              2 – E-Mail (SMTP) nach Anlage&nbsp;7
+            </option>
+            <option value="1" {% if cfg.uebermittlungsmedium == '1' %}selected{% endif %}>
+              1 – DFÜ / KIM (nicht genutzt)
+            </option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-zeichensatz">Zeichensatz</label>
+          <select id="cfg-zeichensatz" name="zeichensatz">
+            <option value="I8" {% if cfg.zeichensatz == 'I8' or not cfg.zeichensatz %}selected{% endif %}>
+              UTF-8 (I8)
+            </option>
+            <option value="I1" {% if cfg.zeichensatz == 'I1' %}selected{% endif %}>
+              ISO-8859-1 (I1)
+            </option>
+          </select>
+        </div>
+      </section>
+
+      <!-- Bankverbindung -->
+      <section class="card">
+        <h3>Bankverbindung (Rechnungsfuß)</h3>
+        <p class="card-subtitle">Diese Angaben erscheinen in der Fußzeile der Rechnung.</p>
+
+        <div class="form-row">
+          <label for="cfg-bank-name">Bankname</label>
+          <input id="cfg-bank-name"
+                 type="text"
+                 name="bank_name"
+                 value="{{ cfg.bank_name or '' }}"
+                 placeholder="z.B. Musterbank">
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-bank-iban">IBAN</label>
+          <input id="cfg-bank-iban"
+                 type="text"
+                 name="bank_iban"
+                 value="{{ cfg.bank_iban or '' }}"
+                 placeholder="z.B. DE12 3456 7890 1234 5678 90">
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-bank-bic">BIC</label>
+          <input id="cfg-bank-bic"
+                 type="text"
+                 name="bank_bic"
+                 value="{{ cfg.bank_bic or '' }}"
+                 placeholder="z.B. GENODEF1XXX">
+        </div>
+
+        <div class="hint-block">
+          Diese Angaben werden in der Fußzeile der Rechnung als Bankverbindung ausgegeben (inkl. IBAN/BIC).
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Rechte Spalte: AUF + SMTP + Absender -->
+    <div>
+
+      <!-- AUF-Details -->
+      <section class="card">
+        <h3>AUF-Details</h3>
+        <p class="card-subtitle">Technische Parameter für den AUF-Übertragungsweg.</p>
+
+        <div class="form-row">
+          <label for="cfg-verf-spec">Verfahrensspezifikation (optional)</label>
+          <input id="cfg-verf-spec"
+                 type="text"
+                 name="verfahren_spezifikation"
+                 value="{{ cfg.verfahren_spezifikation or '' }}">
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-komprimierung">Komprimierung</label>
+          <select id="cfg-komprimierung" name="komprimierung">
+            <option value="00" {% if cfg.komprimierung == '00' or not cfg.komprimierung %}selected{% endif %}>
+              00 – keine
+            </option>
+            <option value="02" {% if cfg.komprimierung == '02' %}selected{% endif %}>02 – gzip</option>
+            <option value="03" {% if cfg.komprimierung == '03' %}selected{% endif %}>03 – ZIP</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-verschl">Verschlüsselungsart</label>
+          <select id="cfg-verschl" name="verschluesselungsart">
+            <option value="00" {% if cfg.verschluesselungsart == '00' %}selected{% endif %}>
+              00 – keine Verschlüsselung
+            </option>
+            <option value="02" {% if cfg.verschluesselungsart == '02' or not cfg.verschluesselungsart %}selected{% endif %}>
+              02 – PKCS#7 (E-Mail-Verschlüsselung)
+            </option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-signatur">Elektronische Unterschrift (Datei)</label>
+          <select id="cfg-signatur" name="elektronische_unterschrift">
+            <option value="00"
+              {% if cfg.elektronische_unterschrift == '00' or not cfg.elektronische_unterschrift %}selected{% endif %}>
+              00 – keine (Papierunterschrift außerhalb des Verfahrens)
+            </option>
+            <option value="02" {% if cfg.elektronische_unterschrift == '02' %}selected{% endif %}>
+              02 – PKCS#7 (elektronische Signatur)
+            </option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-wiederh">Maximale Wiederholungen (z.B. 01)</label>
+          <input id="cfg-wiederh"
+                 type="text"
+                 name="max_wiederholungen"
+                 value="{{ cfg.max_wiederholungen or '01' }}">
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-uebertragungsweg">Übertragungsweg (AUF Feld 230)</label>
+          <select id="cfg-uebertragungsweg" name="uebertragungsweg">
+            <option value="5"
+              {% if cfg.uebertragungsweg == '5' or not cfg.uebertragungsweg %}selected{% endif %}>
+              5 – E-Mail (SMTP) / anderer Weg
+            </option>
+            <option value="1" {% if cfg.uebertragungsweg == '1' %}selected{% endif %}>
+              1 – klassische DFÜ (nicht genutzt)
+            </option>
+          </select>
+        </div>
+      </section>
+
+      <!-- SMTP / E-Mail -->
+      <section class="card">
+        <h3>SMTP / E-Mail</h3>
+        <p class="card-subtitle">Zugangsdaten für den Versand nach Anlage 7.</p>
+
+        <div class="form-row">
+          <label for="cfg-smtp-server">SMTP-Server (z.B. smtp.deinprovider.de)</label>
+          <input id="cfg-smtp-server"
+                 type="text"
+                 name="smtp_server"
+                 value="{{ cfg.smtp_server or '' }}">
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-smtp-port">SMTP-Port</label>
+          <input id="cfg-smtp-port"
+                 type="number"
+                 name="smtp_port"
+                 value="{{ cfg.smtp_port or '' }}">
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-smtp-user">SMTP-Benutzer (meist deine Absender-E-Mail)</label>
+          <input id="cfg-smtp-user"
+                 type="text"
+                 name="smtp_user"
+                 value="{{ cfg.smtp_user or '' }}">
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-smtp-pass">SMTP-Passwort</label>
+          <input id="cfg-smtp-pass"
+                 type="password"
+                 name="smtp_password"
+                 placeholder="{% if cfg.smtp_password %}••••••••{% endif %}">
+          <small class="hint">
+            Leer lassen, um das gespeicherte Passwort nicht zu ändern.
+          </small>
+        </div>
+
+        <div class="form-row">
+          <label class="checkbox-row">
+            <input type="checkbox" name="smtp_use_tls"
+                   {% if cfg.smtp_use_tls is not defined or cfg.smtp_use_tls %}checked{% endif %}>
+            TLS (STARTTLS) verwenden
+          </label>
+        </div>
+      </section>
+
+      <!-- E-Mail Absender -->
+      <section class="card">
+        <h3>E-Mail-Absender</h3>
+        <p class="card-subtitle">Absenderdaten für Versand und Rückfragen.</p>
+
+        <div class="form-row">
+          <label for="cfg-email-abs">Absender-E-Mail (FROM, für Versand nach Anlage 7)</label>
+          <input id="cfg-email-abs"
+                 type="email"
+                 name="email_absender"
+                 value="{{ cfg.email_absender or cfg.kim_adresse or '' }}">
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-kontakt-person">Kontaktperson (optional, nur im E-Mail-Text)</label>
+          <input id="cfg-kontakt-person"
+                 type="text"
+                 name="kontakt_person"
+                 value="{{ cfg.kontakt_person or '' }}">
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-kontakt-tel">Telefon (optional)</label>
+          <input id="cfg-kontakt-tel"
+                 type="text"
+                 name="kontakt_telefon"
+                 value="{{ cfg.kontakt_telefon or '' }}">
+        </div>
+
+        <div class="form-row">
+          <label for="cfg-kontakt-fax">Fax (optional)</label>
+          <input id="cfg-kontakt-fax"
+                 type="text"
+                 name="kontakt_fax"
+                 value="{{ cfg.kontakt_fax or '' }}">
+        </div>
+      </section>
+
+    </div>
+
+  </div>
+
+  <button type="submit" class="btn-primary">Konfiguration speichern</button>
+</form>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const ikInput = document.querySelector('input[name="ik"]');
+    if (!ikInput) return;
+
+    ikInput.addEventListener("input", function () {
+      // nur Ziffern erlauben
+      let v = this.value.replace(/[^0-9]/g, "");
+      // auf 9 Stellen begrenzen
+      if (v.length > 9) {
+        v = v.slice(0, 9);
+      }
+      this.value = v;
+    });
+  });
+</script>
+
+{% endblock %}

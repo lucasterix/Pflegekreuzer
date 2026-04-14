@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg2-binary
+jinja2
+python-multipart
+pypdf
+PyPDF2
+reportlab
+weasyprint
+email-validator
+Pillow

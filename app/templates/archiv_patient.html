@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .page-header {
+    margin-bottom:1rem;
+  }
+  .page-header h2 {
+    margin:0 0 4px 0;
+    font-size:1.8rem;
+  }
+  .page-header small {
+    color:#4a5568;
+    font-size:0.9rem;
+  }
+
+  .card {
+    background:#ffffff;
+    border-radius:10px;
+    border:1px solid #e2e8f0;
+    padding:18px;
+    margin-bottom:1.2rem;
+    box-shadow:0 2px 4px rgba(15,23,42,0.04);
+  }
+
+  .card h3 {
+    margin-top:0;
+    margin-bottom:0.4rem;
+    font-size:1.25rem;
+  }
+  .card-subtitle {
+    margin:0 0 1rem;
+    font-size:0.9rem;
+    color:#64748b;
+  }
+
+  .patient-box strong {
+    font-size:1.1rem;
+  }
+
+  .table-wrap {
+    margin-top:0.6rem;
+    overflow-x:auto;
+  }
+
+  table.archive-details {
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.88rem;
+  }
+  table.archive-details thead tr {
+    background:#f8fafc;
+  }
+  table.archive-details th,
+  table.archive-details td {
+    padding:8px 10px;
+    border-bottom:1px solid #e2e8f0;
+    text-align:left;
+    vertical-align:top;
+  }
+  table.archive-details th {
+    font-weight:600;
+    color:#475569;
+    white-space:nowrap;
+  }
+  table.archive-details tbody tr:nth-child(even) {
+    background:#f9fafb;
+  }
+  table.archive-details tbody tr:hover {
+    background:#eff6ff;
+  }
+
+  .badge {
+    padding:3px 8px;
+    border-radius:8px;
+    font-size:0.75rem;
+    font-weight:600;
+    display:inline-block;
+  }
+  .badge-green {
+    background:#dcfce7;
+    color:#166534;
+  }
+  .badge-blue {
+    background:#dbeafe;
+    color:#1e3a8a;
+  }
+  .badge-red {
+    background:#fee2e2;
+    color:#b91c1c;
+  }
+  .badge-gray {
+    background:#e5e7eb;
+    color:#374151;
+  }
+
+  .btn-link {
+    color:#2563eb;
+    text-decoration:none;
+    font-size:0.85rem;
+  }
+  .btn-link:hover {
+    text-decoration:underline;
+  }
+
+  .file-ok { color:#15803d; font-weight:600; }
+  .file-bad { color:#b91c1c; font-weight:600; }
+</style>
+
+<div class="page-header">
+  <h2>Archiv – Patient</h2>
+  <small>Historische Abrechnungen und vorhandene Archivdateien</small>
+</div>
+
+<!-- Patientendaten -->
+<section class="card patient-box">
+  {% if patient %}
+    <strong>{{ patient.name }}</strong><br>
+    Versichertennummer: <span>{{ patient.versichertennummer }}</span><br>
+    ID: <span>{{ patient.id }}</span>
+  {% else %}
+    <strong>Patient (ID {{ patient_id }}) nicht mehr vorhanden.</strong><br>
+    Archivdateien stehen dennoch weiterhin zur Verfügung.
+  {% endif %}
+</section>
+
+<!-- Monatsauswahl -->
+<section class="card">
+  <h3>Monat auswählen</h3>
+
+  {% if monate %}
+    <form method="get" action="/archiv/{{ patient_id }}">
+      <label>
+        <select name="monat" onchange="this.form.submit()" style="padding:6px 8px;border-radius:6px;border:1px solid #cbd5e1;">
+          {% for m in monate %}
+            <option value="{{ m }}" {% if m == monat %}selected{% endif %}>
+              {{ m }}
+            </option>
+          {% endfor %}
+        </select>
+      </label>
+      <noscript><button type="submit">Filtern</button></noscript>
+    </form>
+  {% else %}
+    <p class="card-subtitle">Keine Abrechnungen vorhanden.</p>
+  {% endif %}
+</section>
+
+<!-- Details – Abrechnungen -->
+<section class="card">
+  <h3>Abrechnungen für {{ monat }}</h3>
+
+  {% if abrechnungen %}
+    <div class="table-wrap">
+      <table class="archive-details">
+        <thead>
+          <tr>
+            <th>Abrechnung ID</th>
+            <th>Monat</th>
+            <th>Gesamtbetrag</th>
+            <th>Erstellt</th>
+            <th>Gesendet</th>
+            <th>Status</th>
+            <th>Archivdateien</th>
+            <th>Aktionen</th>
+          </tr>
+        </thead>
+        <tbody>
+
+        {% for a in abrechnungen %}
+          {% set files = dateien.get(a.id) %}
+
+          <tr>
+            <td>{{ a.id }}</td>
+            <td>{{ a.abrechnungsmonat }}</td>
+            <td>{{ "%.2f"|format(a.gesamt_betrag) }} €</td>
+            <td>{{ a.created_at }}</td>
+            <td>
+              {% if a.gesendet_am %}
+                {{ a.gesendet_am }}
+              {% else %}
+                –
+              {% endif %}
+            </td>
+
+            <!-- Status -->
+            <td>
+              {% if a.storniert %}
+                <span class="badge badge-red">STORNIERT</span><br>
+                {% if a.storniert_am %}
+                  <small>Storno: {{ a.storniert_am }}</small><br>
+                {% endif %}
+                {% if a.gesendet_am %}
+                  <small>Urspr. gesendet: {{ a.gesendet_am }}</small>
+                {% endif %}
+              {% else %}
+                {% if a.gesendet_am %}
+                  <span class="badge badge-blue">GESENDET</span><br>
+                  <small>{{ a.gesendet_am }}</small>
+                {% else %}
+                  <span class="badge badge-green">Aktiv</span><br>
+                  <small>Noch nicht gesendet</small>
+                {% endif %}
+              {% endif %}
+            </td>
+
+            <!-- Archivdateien -->
+            <td>
+              {% if files %}
+                <span class="{{ 'file-ok' if files.xml_exists else 'file-bad' }}">
+                  XML {{ '✔' if files.xml_exists else '✘' }}
+                </span><br>
+
+                <span class="{{ 'file-ok' if files.auf_exists else 'file-bad' }}">
+                  AUF {{ '✔' if files.auf_exists else '✘' }}
+                </span><br>
+
+                <span class="{{ 'file-ok' if files.pdf_exists else 'file-bad' }}">
+                  Begleitzettel {{ '✔' if files.pdf_exists else '✘' }}
+                </span><br>
+
+                <span class="{{ 'file-ok' if files.rechnung_exists else 'file-bad' }}">
+                  Rechnung {{ '✔' if files.rechnung_exists else '✘' }}
+                </span><br>
+
+                <!-- Leistungsnachweise -->
+                <span class="{{ 'file-ok' if files.leistungsnachweis_exists else 'file-bad' }}">
+                  Leistungsnachweis {{ '✔' if files.leistungsnachweis_exists else '✘' }}
+                </span><br>
+
+                <span class="{{ 'file-ok' if files.leistungsnachweis_komplett_exists else 'file-bad' }}">
+                  Leistungsnachweis (kassenversion) {{ '✔' if files.leistungsnachweis_komplett_exists else '✘' }}
+                </span><br>
+              {% else %}
+                <span class="badge badge-gray">Keine Dateien</span>
+              {% endif %}
+            </td>
+
+            <!-- Aktionen -->
+            <td>
+              {% if not a.storniert %}
+                {% if files and files.xml_exists %}
+                  <a class="btn-link" href="/abrechnungen/{{ a.id }}/export">
+                    XML/AUF neu erzeugen
+                  </a><br>
+                {% else %}
+                  <a class="btn-link" href="/abrechnungen/{{ a.id }}/export">
+                    XML erzeugen
+                  </a><br>
+                {% endif %}
+
+                {% if files and files.rechnung_exists %}
+                  <a class="btn-link" href="/abrechnungen/{{ a.id }}/rechnung">
+                    Rechnung öffnen
+                  </a><br>
+                {% endif %}
+
+                {% if files and files.pdf_exists %}
+                  <a class="btn-link" href="/archiv/{{ a.id }}/begleitzettel">
+                    Begleitzettel öffnen
+                  </a><br>
+                {% endif %}
+
+                {% if files and files.leistungsnachweis_exists %}
+                  <a class="btn-link" href="/archiv/{{ a.id }}/leistungsnachweis">
+                    Leistungsnachweis öffnen
+                  </a><br>
+                {% endif %}
+
+                {% if files and files.leistungsnachweis_komplett_exists %}
+                  <a class="btn-link" href="/archiv/{{ a.id }}/leistungsnachweis_komplett">
+                    Leistungsnachweis (kassenversion) öffnen
+                  </a><br>
+                {% endif %}
+              {% else %}
+                <span class="badge badge-gray">Keine Aktionen</span>
+              {% endif %}
+            </td>
+          </tr>
+
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  {% else %}
+    <p class="card-subtitle">Keine Abrechnungen für diesen Monat.</p>
+  {% endif %}
+</section>
+
+<!-- Neue Sektion: Patientenbezogene Dokumente -->
+<section class="card">
+  <h3>Patientenbezogene Dokumente</h3>
+  <p class="card-subtitle">
+    Allgemeine Dateien, die nicht an einen bestimmten Abrechnungsmonat gebunden sind.
+    Hier werden z.&nbsp;B. der finale Antrag (inkl. Unterschrift) und der vom Patienten unterschriebene Antrag abgelegt.
+  </p>
+
+  <div class="table-wrap">
+    <table class="archive-details">
+      <thead>
+        <tr>
+          <th>Dokument</th>
+          <th>Status</th>
+          <th>Aktion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Antrag inkl. Unterschrift -->
+        <tr>
+          <td>Antrag inkl. Unterschrift (finaler Antrag)</td>
+          <td>
+            {% if patient_files and patient_files['antrag_inkl_unterschrift_exists'] %}
+              <span class="file-ok">vorhanden</span>
+            {% else %}
+              <span class="file-bad">nicht vorhanden</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if patient_files and patient_files['antrag_inkl_unterschrift_exists'] %}
+              <a class="btn-link" href="/patients/{{ patient_id }}/antrag_final_download">
+                Antrag herunterladen
+              </a>
+            {% else %}
+              –
+            {% endif %}
+          </td>
+        </tr>
+
+        <!-- Unterschriebener Antrag -->
+        <tr>
+          <td>Unterschriebener Antrag (Original vom Patienten)</td>
+          <td>
+            {% if patient_files and patient_files['unterschriebener_exists'] %}
+              <span class="file-ok">vorhanden</span>
+            {% else %}
+              <span class="file-bad">nicht vorhanden</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if patient_files and patient_files['unterschriebener_exists'] %}
+              <a class="btn-link" href="/patients/{{ patient_id }}/antrag_download">
+                Unterschriebenen Antrag herunterladen
+              </a>
+            {% else %}
+              –
+            {% endif %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{% endblock %}

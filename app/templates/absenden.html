@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .page-header {
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:1rem;
+  }
+  .page-header h2 {
+    margin:0;
+    font-size:1.7rem;
+  }
+  .page-header small {
+    color:#4a5568;
+    font-size:0.9rem;
+  }
+
+  .card {
+    background:#ffffff;
+    border-radius:10px;
+    border:1px solid #e2e8f0;
+    padding:16px 18px;
+    box-shadow:0 2px 4px rgba(15,23,42,0.04);
+    margin-bottom:1rem;
+  }
+
+  .card h3 {
+    margin-top:0;
+    margin-bottom:0.4rem;
+    font-size:1.2rem;
+  }
+  .card-subtitle {
+    margin:0 0 0.8rem;
+    font-size:0.9rem;
+    color:#64748b;
+  }
+
+  .error-banner {
+    background:#fef2f2;
+    border:1px solid #b91c1c;
+    color:#7f1d1d;
+    padding:0.75rem 1rem;
+    margin:0.8rem 0 1.2rem 0;
+    border-radius:8px;
+    font-weight:500;
+    white-space:pre-line;
+    display:flex;
+    gap:8px;
+    align-items:flex-start;
+  }
+
+  .error-icon {
+    margin-top:2px;
+  }
+
+  .form-inline {
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+  }
+  .form-inline label {
+    font-size:0.9rem;
+    color:#334155;
+  }
+  .form-inline input[type="month"] {
+    padding:6px 8px;
+    border-radius:6px;
+    border:1px solid #cbd5e1;
+    font-size:0.95rem;
+    margin-left:4px;
+  }
+  .form-inline input:focus {
+    outline:none;
+    border-color:#3b82f6;
+    box-shadow:0 0 0 1px rgba(59,130,246,0.25);
+  }
+
+  .btn-primary {
+    display:inline-block;
+    padding:7px 12px;
+    border-radius:999px;
+    background:#2563eb;
+    color:#fff;
+    border:none;
+    font-size:0.9rem;
+    cursor:pointer;
+  }
+  .btn-primary:hover {
+    background:#1d4ed8;
+  }
+
+  .btn-secondary {
+    padding:6px 10px;
+    border-radius:999px;
+    background:#e5e7eb;
+    color:#111827;
+    border:1px solid #d1d5db;
+    font-size:0.85rem;
+    cursor:pointer;
+  }
+  .btn-secondary:hover {
+    background:#d4d4d8;
+  }
+
+  button[disabled] {
+    opacity:0.55;
+    cursor:not-allowed;
+  }
+
+  .small-hint {
+    font-size:0.9rem;
+    color:#6b7280;
+    margin-top:0.3rem;
+  }
+
+  .badge-status-ok {
+    display:inline-flex;
+    padding:2px 8px;
+    border-radius:999px;
+    font-size:0.8rem;
+    background:#dcfce7;
+    color:#166534;
+  }
+  .badge-status-open {
+    display:inline-flex;
+    padding:2px 8px;
+    border-radius:999px;
+    font-size:0.8rem;
+    background:#ffedd5;
+    color:#9a3412;
+  }
+
+  /* Tabelle */
+  .table-wrap {
+    margin-top:0.3rem;
+    overflow-x:auto;
+  }
+  table.simple-table {
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.9rem;
+  }
+  table.simple-table thead tr {
+    background:#f8fafc;
+  }
+  table.simple-table th,
+  table.simple-table td {
+    padding:8px 10px;
+    border-bottom:1px solid #e2e8f0;
+    text-align:left;
+    vertical-align:top;
+  }
+  table.simple-table th {
+    font-weight:600;
+    color:#475569;
+    white-space:nowrap;
+  }
+  table.simple-table tbody tr:nth-child(even) {
+    background:#f9fafb;
+  }
+  table.simple-table tbody tr:hover {
+    background:#eff6ff;
+  }
+
+  .amount-cell {
+    text-align:right;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+
+</style>
+
+<div class="page-header">
+  <div>
+    <h2>Abrechnungen absenden</h2>
+    <small>Versende die erzeugten Dateien per E-Mail an die Datenannahmestellen.</small>
+  </div>
+</div>
+
+{# ==== Fehlerbanner ==== #}
+{% if error %}
+  <div id="error-banner" class="error-banner">
+    <div class="error-icon">⚠️</div>
+    <div>
+      <strong>Versandfehler:</strong><br>
+      {{ error }}
+    </div>
+  </div>
+{% endif %}
+
+<!-- Filterbereich für den Monat -->
+<section class="card">
+  <h3>Abrechnungsmonat auswählen</h3>
+  <p class="card-subtitle">
+    Wähle den Monat, dessen Abrechnungen du ansehen und ggf. versenden möchtest.
+  </p>
+
+  <form method="get" action="/absenden" class="form-inline" style="margin-bottom:0.5rem;">
+    <label>Abrechnungsmonat:
+      <input type="month" name="monat" value="{{ monat }}">
+    </label>
+    <button type="submit" class="btn-primary">Filtern</button>
+  </form>
+  <p class="small-hint">
+    Es werden alle Abrechnungen für <strong>{{ monat }}</strong> angezeigt.
+  </p>
+</section>
+
+<!-- Sammelversand -->
+<section class="card">
+  {% set ns = namespace(offene_vorhanden=false) %}
+  {% for a in abrechnungen_monat %}
+    {% if not a.gesendet_am %}
+      {% set ns.offene_vorhanden = true %}
+    {% endif %}
+  {% endfor %}
+
+  <h3>Sammelversand</h3>
+  <p class="card-subtitle">
+    Verschicke alle noch nicht gesendeten Abrechnungen des ausgewählten Monats in einem Schritt.
+  </p>
+
+  <form method="post" action="/absenden/send_all" style="display:inline;">
+    <input type="hidden" name="monat" value="{{ monat }}">
+    <button type="submit"
+            class="btn-primary"
+            {% if not ns.offene_vorhanden %}disabled{% endif %}>
+      Alle noch nicht gesendeten Abrechnungen senden
+    </button>
+  </form>
+
+  {% if not ns.offene_vorhanden %}
+    <p class="small-hint" style="margin-top:0.6rem;">
+      Keine offenen Abrechnungen vorhanden – alles ist bereits versendet.
+    </p>
+  {% else %}
+    <p class="small-hint" style="margin-top:0.6rem;">
+      Es sind noch offene Abrechnungen vorhanden, die versendet werden können.
+    </p>
+  {% endif %}
+</section>
+
+<!-- Detailtabelle: aktueller Monat -->
+<section class="card">
+  <h3>Abrechnungen für {{ monat }}</h3>
+  <p class="card-subtitle">
+    Hier siehst du alle Abrechnungen des Monats und kannst sie einzeln versenden.
+  </p>
+
+  {% if abrechnungen_monat %}
+    <div class="table-wrap">
+      <table class="simple-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Patient</th>
+            <th>Pflegekasse</th>
+            <th>Gesamtbetrag</th>
+            <th>Status Versand</th>
+            <th>Aktion</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for a in abrechnungen_monat %}
+          {% set ist_gesendet = (a.gesendet_am is not none) %}
+          <tr>
+            <td>{{ a.id }}</td>
+            <td>{{ a.patient.name }}</td>
+            <td>{{ a.kasse.name if a.kasse else "-" }}</td>
+            <td class="amount-cell">{{ "%.2f"|format(a.gesamt_betrag) }} €</td>
+
+            <td>
+              {% if ist_gesendet %}
+                <span class="badge-status-ok">
+                  Bereits gesendet ({{ a.gesendet_am.strftime("%d.%m.%Y %H:%M") }})
+                </span>
+              {% else %}
+                <span class="badge-status-open">
+                  Noch nicht gesendet
+                </span>
+              {% endif %}
+            </td>
+
+            <td>
+              <form method="post"
+                    action="/absenden/{{ a.id }}/send"
+                    style="display:inline;">
+                <input type="hidden" name="monat" value="{{ monat }}">
+                <button type="submit"
+                        class="btn-secondary"
+                        {% if ist_gesendet %}disabled{% endif %}>
+                  Senden
+                </button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="card-subtitle" style="margin-top:0.4rem;">
+      Keine Abrechnungen für diesen Monat vorhanden.
+    </p>
+  {% endif %}
+</section>
+
+<!-- Monatsübergreifend: noch nicht gesendete Abrechnungen -->
+<section class="card" style="margin-top:2rem;">
+  <h3>Monatsübergreifend: Noch nicht gesendete Abrechnungen</h3>
+  <p class="card-subtitle">
+    Hier siehst du alle Patienten, für die Abrechnungen existieren,
+    die aber noch nicht an die Datenannahmestellen versendet wurden – egal in welchem Monat.
+  </p>
+
+  {% if offene_abrechnungen_alle %}
+    <div class="table-wrap">
+      <table class="simple-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Monat</th>
+            <th>Patient</th>
+            <th>Pflegekasse</th>
+            <th>Gesamtbetrag</th>
+            <th>Status</th>
+            <th>Aktion</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for a in offene_abrechnungen_alle %}
+          <tr>
+            <td>{{ a.id }}</td>
+            <td>{{ a.abrechnungsmonat }}</td>
+            <td>{{ a.patient.name }}</td>
+            <td>{{ a.kasse.name if a.kasse else "-" }}</td>
+            <td class="amount-cell">{{ "%.2f"|format(a.gesamt_betrag) }} €</td>
+            <td>
+              <span class="badge-status-open">
+                Noch nicht gesendet
+              </span>
+            </td>
+            <td>
+              <form method="post"
+                    action="/absenden/{{ a.id }}/send"
+                    style="display:inline;">
+                <input type="hidden" name="monat" value="{{ monat }}">
+                <button type="submit" class="btn-secondary">
+                  Jetzt senden
+                </button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="small-hint" style="margin-top:0.5rem;">
+      Es gibt aktuell keine monatsübergreifend offenen Abrechnungen. Alles ist versendet. 🚢
+    </p>
+  {% endif %}
+</section>
+
+{% endblock %}

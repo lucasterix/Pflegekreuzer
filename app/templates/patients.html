@@ -1,0 +1,772 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .page-header {
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:1rem;
+  }
+  .page-header h2 { margin:0; font-size:1.7rem; }
+  .page-header small { color:#4a5568; font-size:0.9rem; }
+
+  .card {
+    background:#ffffff;
+    border-radius:10px;
+    border:1px solid #e2e8f0;
+    padding:16px 18px;
+    box-shadow:0 2px 4px rgba(15,23,42,0.04);
+    margin-bottom:1rem;
+  }
+
+  .card h3 { margin-top:0; margin-bottom:0.4rem; font-size:1.2rem; }
+  .card-subtitle { margin:0 0 1rem; font-size:0.9rem; color:#64748b; }
+
+  .form-grid {
+    display:grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap:12px 18px;
+    max-width:880px;
+  }
+  @media (max-width: 800px) {
+    .form-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+  .form-row-span2 { grid-column: 1 / -1; }
+
+  .form-row { margin-bottom:0.25rem; }
+  .form-row label { font-size:0.9rem; color:#334155; display:block; margin-bottom:0.2rem; }
+  .form-row input[type="text"],
+  .form-row input[type="date"],
+  .form-row textarea {
+    width:100%;
+    padding:7px 9px;
+    border-radius:6px;
+    border:1px solid #cbd5e1;
+    font-size:0.95rem;
+  }
+  .form-row textarea { resize:vertical; min-height:70px; }
+  .form-row input:focus,
+  .form-row textarea:focus {
+    outline:none;
+    border-color:#3b82f6;
+    box-shadow:0 0 0 1px rgba(59,130,246,0.25);
+  }
+
+  .pdf-upload-box {
+    margin-bottom:1rem;
+    padding:0.75rem 1rem;
+    border:1px solid #e2e8f0;
+    border-radius:8px;
+    background:#f8fafc;
+    max-width:880px;
+  }
+
+  #pdf-drop {
+    margin-top:0.5rem;
+    border:2px dashed #4CAF50;
+    border-radius:8px;
+    padding:12px;
+    text-align:center;
+    cursor:pointer;
+    background:#fdfefc;
+    transition:border-color 0.15s, background-color 0.15s;
+    font-size:0.9rem;
+  }
+
+  .btn-primary {
+    display:inline-block;
+    padding:8px 14px;
+    border-radius:999px;
+    background:#2563eb;
+    color:#fff;
+    border:none;
+    font-size:0.95rem;
+    cursor:pointer;
+    margin-top:0.75rem;
+  }
+  .btn-primary:hover { background:#1d4ed8; }
+
+  .btn-secondary {
+    padding:6px 10px;
+    border-radius:999px;
+    background:#e5e7eb;
+    color:#111827;
+    border:1px solid #d1d5db;
+    font-size:0.85rem;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .btn-secondary[disabled] { opacity:0.6; cursor:not-allowed; }
+  .btn-secondary:hover:not([disabled]) { background:#d4d4d8; }
+
+  .btn-danger {
+    padding:6px 10px;
+    border-radius:999px;
+    background:#fee2e2;
+    color:#b91c1c;
+    border:1px solid #fecaca;
+    font-size:0.85rem;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .btn-danger:hover { background:#fecaca; }
+
+  .kasse-wrapper { display:flex; flex-direction:column; gap:4px; }
+  .kasse-wrapper input[type="text"] { width:100%; }
+  .small-hint { font-size:0.8rem; color:#6b7280; }
+
+  .list-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:0.4rem;
+  }
+  .list-header small { color:#64748b; font-size:0.9rem; }
+
+  .search-box {
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid #cbd5e1;
+    background:#f8fafc;
+    min-width:220px;
+  }
+  .search-box input {
+    border:none;
+    background:transparent;
+    outline:none;
+    font-size:0.9rem;
+    width:140px;
+  }
+
+  .table-wrap { margin-top:0.2rem; overflow-x:auto; }
+
+  table.pat-table { width:100%; border-collapse:collapse; font-size:0.92rem; }
+  table.pat-table thead tr { background:#f8fafc; }
+  table.pat-table th,
+  table.pat-table td {
+    padding:8px 10px;
+    border-bottom:1px solid #e2e8f0;
+    text-align:left;
+    vertical-align:top;
+  }
+  table.pat-table th { font-weight:600; color:#475569; white-space:nowrap; }
+  table.pat-table tbody tr:nth-child(even) { background:#f9fafb; }
+  table.pat-table tbody tr:hover { background:#eff6ff; }
+
+  .cell-muted { color:#6b7280; }
+  .cell-address { white-space:pre-line; }
+  .cell-archiv a { text-decoration:none; color:#2563eb; }
+  .cell-archiv a:hover { text-decoration:underline; }
+  .cell-ln, .cell-actions { text-align:center; white-space:nowrap; }
+
+  .antrag-drop {
+    border:1px dashed #cbd5e1;
+    border-radius:8px;
+    padding:6px 8px;
+    font-size:0.8rem;
+    background:#f9fafb;
+    cursor:pointer;
+    position:relative;
+  }
+  .antrag-drop.highlight { border-color:#22c55e; background:#ecfdf5; }
+  .antrag-drop-text { color:#4b5563; }
+  .antrag-status { margin-top:3px; font-size:0.75rem; color:#4b5563; }
+  .antrag-status.error { color:#b91c1c; }
+  .antrag-link {
+    display:block;
+    margin-top:4px;
+    font-size:0.8rem;
+    text-decoration:none;
+    color:#2563eb;
+  }
+  .antrag-link:hover { text-decoration:underline; }
+
+  .modal-backdrop {
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,0.35);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+  }
+  .modal-backdrop.active { display:flex; }
+  .modal {
+    background:#ffffff;
+    border-radius:12px;
+    padding:24px 26px;
+    box-shadow:0 10px 25px rgba(15,23,42,0.3);
+    width:100%;
+    max-width:520px;
+    box-sizing:border-box;
+  }
+  .modal-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:0.5rem;
+  }
+  .modal-header h4 { margin:0; font-size:1.1rem; }
+  .modal-close { border:none; background:transparent; font-size:1.1rem; cursor:pointer; }
+  .modal-footer {
+    margin-top:1rem;
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+  }
+</style>
+
+<div class="page-header">
+  <div>
+    <h2>Patienten</h2>
+    <small>Patienten verwalten, aus PDF übernehmen und Anträge vorbereiten.</small>
+  </div>
+</div>
+
+<!-- Karte 1: Neuer Patient -->
+<div class="card">
+  <h3>Neue/n Patient/in anlegen</h3>
+  <p class="card-subtitle">
+    Du kannst die Daten manuell eingeben oder ein Patienten-PDF hochladen, um Felder automatisch zu füllen.
+  </p>
+
+  <form method="post" action="/patients" style="margin-bottom: 0;">
+
+    <div class="pdf-upload-box">
+      <strong style="font-size:0.95rem;">Patienten-PDF hochladen (optional)</strong><br>
+      <small style="font-size:0.85rem; color:#4a5568;">
+        Wenn du hier ein PDF hochlädst, werden die Felder unten – soweit möglich – automatisch vorausgefüllt.
+      </small>
+
+      <div id="pdf-drop">
+        <p id="pdf-drop-text" style="margin:0;">
+          <strong>PDF hierhin ziehen</strong> oder klicken, um eine Datei auszuwählen
+        </p>
+        <input type="file" id="pdf-file" name="patient_pdf" accept="application/pdf" style="display:none;">
+        <div id="pdf-status" style="margin-top:0.3rem; font-size:0.85rem; color:#4a5568;"></div>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-row">
+        <label for="pat-name">Name</label>
+        <input id="pat-name" type="text" name="name" required>
+      </div>
+
+      <div class="form-row">
+        <label for="pat-vsnr">Versichertennummer</label>
+        <input id="pat-vsnr" type="text" name="versichertennummer" required>
+      </div>
+
+      <div class="form-row">
+        <label for="pat-gebdat">Geburtsdatum</label>
+        <input id="pat-gebdat" type="date" name="geburtsdatum" required>
+      </div>
+
+      <div class="form-row">
+        <label for="kasse-input">Pflegekasse</label>
+        <div class="kasse-wrapper">
+          <input id="kasse-input"
+                 type="text"
+                 list="kassen-liste"
+                 placeholder="Pflegekasse eingeben …"
+                 autocomplete="off"
+                 required>
+          <datalist id="kassen-liste">
+            {% for k in kassen %}
+              <option data-id="{{ k.id }}" value="{{ k.name }}"></option>
+            {% endfor %}
+          </datalist>
+          <input type="hidden" name="kasse_id" id="kasse-id">
+          <span class="small-hint">
+            Beim Tippen werden passende Pflegekassen vorgeschlagen. Bitte einen Eintrag aus der Vorschlagsliste wählen.
+          </span>
+        </div>
+      </div>
+
+      <div class="form-row form-row-span2">
+        <label for="pat-address">Anschrift</label>
+        <textarea id="pat-address" name="address" required rows="3"></textarea>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-primary">
+      Patient speichern
+    </button>
+  </form>
+</div>
+
+<!-- Karte 2: Patientenliste -->
+<div class="card">
+  <div class="list-header">
+    <div>
+      <h3>Bestehende Patienten</h3>
+      <small>Suche nach Name, Versichertennummer, Adresse oder Pflegekasse.</small>
+    </div>
+    {% if patients %}
+      <div class="search-box">
+        <span style="font-size:0.9rem; color:#64748b;">🔍</span>
+        <input id="patient-filter" type="text" placeholder="Filtern …">
+      </div>
+    {% endif %}
+  </div>
+
+  {% if patients %}
+    <div class="table-wrap">
+      <table class="pat-table" id="patients-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Versichertennr.</th>
+            <th>Geburtsdatum</th>
+            <th>Anschrift</th>
+            <th>Pflegekasse</th>
+            <th>Archiv</th>
+            <th>Erstantrag / LN</th>
+            <th>Unterschriebener Antrag</th>
+            <th>Aktion</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for p in patients %}
+          <tr
+            data-filter-text="{{ (p.name ~ ' ' ~ (p.versichertennummer or '') ~ ' ' ~ (p.address or '') ~ ' ' ~ (p.kasse.name if p.kasse else '')) | lower }}"
+            data-patient-id="{{ p.id }}"
+            data-patient-name="{{ p.name }}"
+            data-patient-vsnr="{{ p.versichertennummer }}"
+            data-patient-gebdat="{{ p.geburtsdatum.strftime('%Y-%m-%d') if p.geburtsdatum else '' }}"
+            data-patient-address="{{ p.address or '' }}"
+            data-patient-kasse="{{ p.kasse.name if p.kasse else '' }}"
+            data-patient-kasse-id="{{ p.kasse_id or '' }}"
+          >
+            <td>{{ p.name }}</td>
+            <td>{{ p.versichertennummer }}</td>
+            <td>
+              {% if p.geburtsdatum %}
+                {{ p.geburtsdatum.strftime("%d.%m.%Y") }}
+              {% else %}
+                <span class="cell-muted">–</span>
+              {% endif %}
+            </td>
+            <td class="cell-address">{{ p.address }}</td>
+            <td>{{ p.kasse.name if p.kasse else "-" }}</td>
+            <td class="cell-archiv">
+              <a href="/archiv/{{ p.id }}">Archiv öffnen</a>
+            </td>
+            <td class="cell-ln">
+              <a href="/patients/{{ p.id }}/pflegeantrag" class="btn-secondary" target="_blank">
+                generieren
+              </a>
+            </td>
+            <td class="cell-ln">
+              <div class="antrag-drop" data-patient-id="{{ p.id }}">
+                <div class="antrag-drop-text">
+                  {% if p.unterschriebener_antrag %}
+                    <strong>PDF vorhanden.</strong><br>
+                    Zum Ersetzen PDF ziehen oder klicken.
+                  {% else %}
+                    <strong>PDF hier ziehen oder klicken</strong><br>
+                    um unterschriebenen Antrag hochzuladen
+                  {% endif %}
+                </div>
+                <input type="file" accept="application/pdf" class="antrag-file-input" style="display:none;">
+                <div class="antrag-status"></div>
+                {% if p.unterschriebener_antrag %}
+                  <a href="/patients/{{ p.id }}/antrag_download"
+                     target="_blank"
+                     class="antrag-link">
+                    📄 Unterschriebenen Antrag ansehen
+                  </a>
+                {% endif %}
+              </div>
+            </td>
+            <td class="cell-actions">
+              <button type="button"
+                      class="btn-secondary btn-edit"
+                      data-patient-id="{{ p.id }}">
+                Bearbeiten
+              </button>
+
+              <button type="button"
+                      class="btn-danger btn-delete"
+                      data-patient-id="{{ p.id }}"
+                      data-patient-name="{{ p.name }}">
+                Löschen
+              </button>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="card-subtitle" style="margin-top:0.5rem;">
+      Noch keine Patienten angelegt.
+    </p>
+  {% endif %}
+</div>
+
+<!-- Modal: Patient bearbeiten -->
+<div class="modal-backdrop" id="edit-modal-backdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <h4>Patient bearbeiten</h4>
+      <button type="button" class="modal-close" data-close-edit>&times;</button>
+    </div>
+
+    <!-- WICHTIG: action wird per JS auf /patients/{id}/update gesetzt -->
+    <form id="edit-patient-form" method="post">
+      <div class="form-row">
+        <label for="edit-name">Name</label>
+        <input id="edit-name" name="name" type="text" required>
+      </div>
+      <div class="form-row">
+        <label for="edit-vsnr">Versichertennummer</label>
+        <input id="edit-vsnr" name="versichertennummer" type="text" required>
+      </div>
+      <div class="form-row">
+        <label for="edit-gebdat">Geburtsdatum</label>
+        <input id="edit-gebdat" name="geburtsdatum" type="date">
+      </div>
+      <div class="form-row">
+        <label for="edit-address">Anschrift</label>
+        <textarea id="edit-address" name="address" rows="3"></textarea>
+      </div>
+      <div class="form-row">
+        <label for="edit-kasse">Pflegekasse</label>
+        <input id="edit-kasse"
+               name="kasse_name"
+               type="text"
+               list="kassen-liste"
+               autocomplete="off">
+        <input type="hidden" id="edit-kasse-id" name="kasse_id">
+        <span class="small-hint">Beim Tippen werden passende Pflegekassen vorgeschlagen.</span>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" data-close-edit>Abbrechen</button>
+        <button type="submit" class="btn-primary">Speichern</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Patient löschen -->
+<div class="modal-backdrop" id="delete-modal-backdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <h4>Patient löschen</h4>
+      <button type="button" class="modal-close" data-close-delete>&times;</button>
+    </div>
+    <p id="delete-text" style="font-size:0.9rem; color:#374151; margin-bottom:0.5rem;">
+      Soll dieser Patient wirklich gelöscht werden?
+    </p>
+    <p class="small-hint">
+      Achtung: Bereits erzeugte Abrechnungen bleiben im Archiv, sind aber nicht mehr mit diesem Patienten verknüpft.
+    </p>
+    <form id="delete-patient-form" method="post">
+      <input type="hidden" name="_method" value="delete">
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" data-close-delete>Abbrechen</button>
+        <button type="submit" class="btn-danger">Ja, löschen</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // ===========================
+  //  Kassen-Autocomplete (Create + Edit)
+  // ===========================
+  const kassenOptions = Array.from(document.querySelectorAll("#kassen-liste option"));
+
+  function resolveKasseIdByName(name) {
+    const trimmed = (name || "").trim();
+    if (!trimmed) return null;
+    const opt = kassenOptions.find(o => o.value === trimmed);
+    return opt ? opt.dataset.id : null;
+  }
+
+  // Create Form
+  const kasseInput = document.getElementById("kasse-input");
+  const kasseIdHidden = document.getElementById("kasse-id");
+  const createForm = document.querySelector('form[action="/patients"]');
+
+  if (kasseInput && kasseIdHidden) {
+    kasseInput.addEventListener("change", () => {
+      const id = resolveKasseIdByName(kasseInput.value);
+      kasseIdHidden.value = id || "";
+    });
+
+    if (createForm) {
+      createForm.addEventListener("submit", (e) => {
+        const id = resolveKasseIdByName(kasseInput.value);
+        if (!id) {
+          e.preventDefault();
+          alert("Bitte eine Pflegekasse aus der Vorschlagsliste auswählen.");
+          return;
+        }
+        kasseIdHidden.value = id;
+      });
+    }
+  }
+
+  // ===========================
+  //  Patienten-PDF Auto-Fill
+  // ===========================
+  const pdfDrop   = document.getElementById("pdf-drop");
+  const pdfInput  = document.getElementById("pdf-file");
+  const pdfStatus = document.getElementById("pdf-status");
+
+  const nameField    = document.querySelector('input[name="name"]');
+  const vsnrField    = document.querySelector('input[name="versichertennummer"]');
+  const dobField     = document.querySelector('input[name="geburtsdatum"]');
+  const addressField = document.querySelector('textarea[name="address"]');
+
+  function setStatus(msg, isError = false) {
+    if (!pdfStatus) return;
+    pdfStatus.textContent = msg || "";
+    pdfStatus.style.color = isError ? "#b91c1c" : "#4a5568";
+  }
+
+  function highlightPdfDrop(on) {
+    if (!pdfDrop) return;
+    pdfDrop.style.borderColor = on ? "#388E3C" : "#4CAF50";
+    pdfDrop.style.background   = on ? "#eefaf0" : "#fdfefc";
+  }
+
+  function setKasseById(kasseId) {
+    if (!kasseId || !kasseInput || !kasseIdHidden) return;
+    const opt = kassenOptions.find(o => String(o.dataset.id) === String(kasseId));
+    if (!opt) return;
+    kasseInput.value = opt.value;
+    kasseIdHidden.value = opt.dataset.id;
+  }
+
+  function handlePatientPdf(file) {
+    if (!file) return;
+    if (file.type !== "application/pdf") {
+      setStatus("Bitte eine PDF-Datei auswählen.", true);
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setStatus("Die Datei ist größer als 5 MB.", true);
+      return;
+    }
+
+    setStatus("PDF wird analysiert …");
+
+    const fd = new FormData();
+    fd.append("patient_pdf", file);
+
+    fetch("/patients/parse_pdf", { method: "POST", body: fd })
+      .then(async (res) => {
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || ("Fehler " + res.status));
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (data.name) nameField.value = data.name;
+        if (data.versichertennummer) vsnrField.value = data.versichertennummer;
+        if (data.geburtsdatum) dobField.value = data.geburtsdatum;
+        if (data.address) addressField.value = data.address;
+        if (data.kasse_id) setKasseById(data.kasse_id);
+
+        setStatus("PDF erfolgreich analysiert. Felder wurden vorausgefüllt.");
+      })
+      .catch((err) => {
+        console.error("Fehler beim PDF-Parsing:", err);
+        setStatus("PDF konnte nicht ausgewertet werden.", true);
+      });
+  }
+
+  if (pdfDrop && pdfInput) {
+    pdfDrop.addEventListener("click", () => pdfInput.click());
+    pdfDrop.addEventListener("dragover", (e) => { e.preventDefault(); highlightPdfDrop(true); });
+    pdfDrop.addEventListener("dragleave", (e) => { e.preventDefault(); highlightPdfDrop(false); });
+    pdfDrop.addEventListener("drop", (e) => {
+      e.preventDefault();
+      highlightPdfDrop(false);
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file) {
+        pdfInput.files = e.dataTransfer.files;
+        handlePatientPdf(file);
+      }
+    });
+    pdfInput.addEventListener("change", () => {
+      const file = pdfInput.files && pdfInput.files[0];
+      if (file) handlePatientPdf(file);
+    });
+  }
+
+  // ===========================
+  //  Patienten-Filter
+  // ===========================
+  const patFilterInput = document.getElementById("patient-filter");
+  if (patFilterInput) {
+    const rows = Array.from(document.querySelectorAll("#patients-table tbody tr"));
+    patFilterInput.addEventListener("input", () => {
+      const q = patFilterInput.value.trim().toLowerCase();
+      if (!q) { rows.forEach(tr => tr.style.display = ""); return; }
+      rows.forEach(tr => {
+        const txt = tr.dataset.filterText || "";
+        tr.style.display = txt.includes(q) ? "" : "none";
+      });
+    });
+  }
+
+  // ===========================
+  //  Upload unterschriebener Antrag
+  // ===========================
+  function uploadAntrag(patientId, file, dropEl) {
+    if (!file) return;
+    const statusEl = dropEl.querySelector(".antrag-status");
+
+    if (statusEl) {
+      statusEl.textContent = "Upload läuft …";
+      statusEl.classList.remove("error");
+    }
+
+    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+      if (statusEl) { statusEl.textContent = "Bitte eine PDF-Datei auswählen."; statusEl.classList.add("error"); }
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      if (statusEl) { statusEl.textContent = "Datei ist größer als 10 MB."; statusEl.classList.add("error"); }
+      return;
+    }
+
+    const fd = new FormData();
+    fd.append("antrag_pdf", file);
+
+    fetch(`/patients/${patientId}/antrag_upload`, { method: "POST", body: fd })
+      .then((res) => {
+        if (!res.ok) throw new Error("Upload fehlgeschlagen (Status " + res.status + ")");
+        if (statusEl) { statusEl.textContent = "Upload erfolgreich. Seite wird neu geladen …"; statusEl.classList.remove("error"); }
+        setTimeout(() => window.location.reload(), 600);
+      })
+      .catch((err) => {
+        console.error("Fehler beim Upload:", err);
+        if (statusEl) { statusEl.textContent = "Upload fehlgeschlagen."; statusEl.classList.add("error"); }
+      });
+  }
+
+  document.querySelectorAll(".antrag-drop").forEach(dropEl => {
+    const patientId = dropEl.dataset.patientId;
+    const fileInput = dropEl.querySelector(".antrag-file-input");
+
+    function setHighlight(on) { dropEl.classList.toggle("highlight", !!on); }
+
+    dropEl.addEventListener("click", () => fileInput && fileInput.click());
+    dropEl.addEventListener("dragover", (e) => { e.preventDefault(); setHighlight(true); });
+    dropEl.addEventListener("dragleave", (e) => { e.preventDefault(); setHighlight(false); });
+    dropEl.addEventListener("drop", (e) => {
+      e.preventDefault();
+      setHighlight(false);
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file && patientId) uploadAntrag(patientId, file, dropEl);
+    });
+
+    if (fileInput) {
+      fileInput.addEventListener("change", () => {
+        const file = fileInput.files && fileInput.files[0];
+        if (file && patientId) uploadAntrag(patientId, file, dropEl);
+      });
+    }
+  });
+
+  // ===========================
+  //  Edit / Delete Modals
+  // ===========================
+  const editBackdrop = document.getElementById("edit-modal-backdrop");
+  const deleteBackdrop = document.getElementById("delete-modal-backdrop");
+  const editForm = document.getElementById("edit-patient-form");
+  const deleteForm = document.getElementById("delete-patient-form");
+  const deleteText = document.getElementById("delete-text");
+
+  function openEditModal(row) {
+    if (!editBackdrop || !editForm) return;
+
+    const id = row.dataset.patientId;
+    const name = row.dataset.patientName || "";
+    const vsnr = row.dataset.patientVsnr || "";
+    const gebdat = row.dataset.patientGebdat || "";
+    const addr = row.dataset.patientAddress || "";
+    const kasseName = row.dataset.patientKasse || "";
+    const kasseId = row.dataset.patientKasseId || "";
+
+    // WICHTIG: passt zu deinem FastAPI endpoint: /patients/{patient_id}/update
+    editForm.action = `/patients/${id}/update`;
+
+    document.getElementById("edit-name").value = name;
+    document.getElementById("edit-vsnr").value = vsnr;
+    document.getElementById("edit-gebdat").value = gebdat;
+    document.getElementById("edit-address").value = addr;
+
+    const editKasseInput = document.getElementById("edit-kasse");
+    const editKasseIdHidden = document.getElementById("edit-kasse-id");
+    editKasseInput.value = kasseName;
+    editKasseIdHidden.value = kasseId;
+
+    editBackdrop.classList.add("active");
+  }
+
+  function closeEditModal() { editBackdrop && editBackdrop.classList.remove("active"); }
+  function openDeleteModal(id, name) {
+    if (!deleteBackdrop || !deleteForm) return;
+    deleteForm.action = `/patients/${id}/delete`;
+    if (deleteText) deleteText.textContent = `Soll der Patient „${name}“ wirklich gelöscht werden?`;
+    deleteBackdrop.classList.add("active");
+  }
+  function closeDeleteModal() { deleteBackdrop && deleteBackdrop.classList.remove("active"); }
+
+  document.querySelectorAll(".btn-edit").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.patientId;
+      const row = document.querySelector(`tr[data-patient-id="${id}"]`);
+      if (row) openEditModal(row);
+    });
+  });
+
+  document.querySelectorAll(".btn-delete").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.patientId;
+      const name = btn.dataset.patientName || "";
+      openDeleteModal(id, name);
+    });
+  });
+
+  document.querySelectorAll("[data-close-edit]").forEach(el => el.addEventListener("click", closeEditModal));
+  document.querySelectorAll("[data-close-delete]").forEach(el => el.addEventListener("click", closeDeleteModal));
+
+  [editBackdrop, deleteBackdrop].forEach(backdrop => {
+    if (!backdrop) return;
+    backdrop.addEventListener("click", (e) => { if (e.target === backdrop) backdrop.classList.remove("active"); });
+  });
+
+  // Kasse-Auflösung im Edit-Formular (setzt kasse_id hidden)
+  const editKasseInput = document.getElementById("edit-kasse");
+  const editKasseIdHidden = document.getElementById("edit-kasse-id");
+  if (editKasseInput && editKasseIdHidden && editForm) {
+    editKasseInput.addEventListener("change", () => {
+      const id = resolveKasseIdByName(editKasseInput.value);
+      editKasseIdHidden.value = id || "";
+    });
+    editForm.addEventListener("submit", () => {
+      const id = resolveKasseIdByName(editKasseInput.value);
+      editKasseIdHidden.value = id || "";
+    });
+  }
+});
+</script>
+
+{% endblock %}

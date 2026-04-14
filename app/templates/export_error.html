@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+
+  <h2>Export nicht möglich</h2>
+
+  <div class="export-error">
+    <p>
+      Die Abrechnungsdatei konnte nicht erzeugt werden, weil
+      mindestens eine fachliche Voraussetzung nicht erfüllt ist:
+    </p>
+
+    <ul>
+      {% for msg in errors %}
+        <li>{{ msg }}</li>
+      {% endfor %}
+    </ul>
+
+    <p class="export-error-meta">
+      <strong>Abrechnung:</strong> ID {{ abrechnung.id }}<br>
+      <strong>Patient:</strong> {{ patient.name }}<br>
+      <strong>Pflegekasse:</strong>
+      {% if kasse %}
+        {{ kasse.name }} (IK: {{ kasse.ik or "–" }}
+        {% if kasse.aktiv is not none %}
+          , Status:
+          {% if kasse.aktiv %}
+            aktiv
+          {% else %}
+            inaktiv
+          {% endif %}
+        {% endif %}
+        )
+      {% else %}
+        – (keine hinterlegt)
+      {% endif %}
+    </p>
+
+    <div class="export-error-actions">
+      <a class="btn" href="/config">Konfiguration öffnen</a>
+      <a class="btn btn-secondary" href="/abrechnungen">Zurück zur Abrechnungsliste</a>
+    </div>
+  </div>
+
+  <style>
+    .export-error {
+      border: 1px solid #e53e3e;
+      background: #fff5f5;
+      color: #742a2a;
+      padding: 1rem 1.25rem;
+      border-radius: 6px;
+      max-width: 720px;
+      margin-top: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      font-size: 0.95rem;
+    }
+
+    .export-error ul {
+      margin: 0.5rem 0 0.75rem 1.25rem;
+      padding-left: 0;
+    }
+
+    .export-error-meta {
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    .export-error-actions {
+      margin-top: 0.75rem;
+    }
+
+    .export-error .btn {
+      display: inline-block;
+      margin-right: 0.5rem;
+      margin-top: 0.25rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      text-decoration: none;
+      background: #3182ce;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+
+    .export-error .btn.btn-secondary {
+      background: #4a5568;
+    }
+
+    .export-error .btn:hover {
+      opacity: 0.9;
+    }
+  </style>
+
+{% endblock %}

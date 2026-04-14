@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .page-header {
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:1rem;
+  }
+  .page-header h2 {
+    margin:0;
+    font-size:1.7rem;
+  }
+  .page-header small {
+    color:#4a5568;
+    font-size:0.9rem;
+  }
+
+  .card {
+    background:#ffffff;
+    border-radius:10px;
+    border:1px solid #e2e8f0;
+    padding:16px 18px;
+    box-shadow:0 2px 4px rgba(15,23,42,0.04);
+    max-width:100%;
+    box-sizing:border-box;
+  }
+
+  .card h3 {
+    margin-top:0;
+    margin-bottom:0.4rem;
+    font-size:1.2rem;
+  }
+  .card-subtitle {
+    margin:0 0 1rem;
+    font-size:0.9rem;
+    color:#64748b;
+  }
+
+  /* Tabelle */
+  .table-wrap {
+    margin-top:0.5rem;
+    overflow-x:auto;
+  }
+
+  table.phm-table {
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.92rem;
+  }
+  table.phm-table thead tr {
+    background:#f8fafc;
+  }
+  table.phm-table th,
+  table.phm-table td {
+    padding:8px 10px;
+    border-bottom:1px solid #e2e8f0;
+    text-align:left;
+    vertical-align:top;
+  }
+  table.phm-table th {
+    font-weight:600;
+    color:#475569;
+    white-space:nowrap;
+  }
+  table.phm-table tbody tr:nth-child(even) {
+    background:#f9fafb;
+  }
+  table.phm-table tbody tr:hover {
+    background:#eff6ff;
+  }
+
+  /* Spaltenbreiten grob steuern */
+  table.phm-table th:nth-child(1),
+  table.phm-table td:nth-child(1) {
+    width:40px;
+    white-space:nowrap;
+  }
+  table.phm-table th:nth-child(3),
+  table.phm-table td:nth-child(3) {
+    width:130px;
+    white-space:nowrap;
+  }
+  table.phm-table th:nth-child(4),
+  table.phm-table td:nth-child(4) {
+    width:80px;
+    white-space:nowrap;
+  }
+  table.phm-table th:nth-child(5),
+  table.phm-table td:nth-child(5) {
+    width:110px;
+    white-space:nowrap;
+  }
+
+  /* Bezeichnungs-Spalte: darf umbrechen */
+  .phm-col-bez {
+    white-space:normal;
+    word-break:break-word;
+  }
+
+  .phm-price {
+    text-align:right;
+    white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+  }
+  .badge-kennz {
+    display:inline-flex;
+    align-items:center;
+    padding:2px 7px;
+    border-radius:999px;
+    font-size:0.78rem;
+    background:#e0f2fe;
+    color:#0369a1;
+  }
+</style>
+
+<div class="page-header">
+  <div>
+    <h2>Pflegehilfsmittel</h2>
+    <small>Alle gespeicherten, abrechnungsfähigen Pflegehilfsmittel.</small>
+  </div>
+</div>
+
+<section class="card">
+  <h3>Gespeicherte Pflegehilfsmittel</h3>
+  <p class="card-subtitle">
+    Diese Pflegehilfsmittel stehen für die Abrechnungen zur Verfügung.
+  </p>
+
+  {% if items %}
+    <div class="table-wrap">
+      <table class="phm-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Bezeichnung</th>
+            <th>Positionsnummer</th>
+            <th>Kennz.</th>
+            <th>Packungsgröße</th>
+            <th class="phm-price">Preis brutto</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for h in items %}
+          <tr>
+            <td>{{ h.id }}</td>
+            <td class="phm-col-bez">{{ h.bezeichnung }}</td>
+            <td>{{ h.positionsnummer }}</td>
+            <td>
+              <span class="badge-kennz">{{ h.kennzeichen }}</span>
+            </td>
+            <td>{{ h.packungsgroesse }}</td>
+            <td class="phm-price">{{ "%.2f"|format(h.preis_brutto) }} €</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="card-subtitle" style="margin-top:0.5rem;">
+      Noch keine Pflegehilfsmittel angelegt.
+    </p>
+  {% endif %}
+</section>
+
+{% endblock %}

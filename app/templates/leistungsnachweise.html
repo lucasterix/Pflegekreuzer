@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .page-header {
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:1rem;
+  }
+  .page-header h2 {
+    margin:0;
+    font-size:1.7rem;
+  }
+  .page-header small {
+    color:#4a5568;
+    font-size:0.9rem;
+  }
+
+  .card {
+    background:#ffffff;
+    border-radius:10px;
+    border:1px solid #e2e8f0;
+    padding:16px 18px;
+    box-shadow:0 2px 4px rgba(15,23,42,0.04);
+    margin-bottom:1rem;
+  }
+
+  .card h3 {
+    margin-top:0;
+    margin-bottom:0.4rem;
+    font-size:1.2rem;
+  }
+  .card-subtitle {
+    margin:0 0 0.8rem;
+    font-size:0.9rem;
+    color:#64748b;
+  }
+
+  .table-wrap {
+    margin-top:0.4rem;
+    overflow-x:auto;
+  }
+
+  table.ln-table {
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.9rem;
+  }
+  table.ln-table thead tr {
+    background:#f8fafc;
+  }
+  table.ln-table th,
+  table.ln-table td {
+    padding:8px 10px;
+    border-bottom:1px solid #e2e8f0;
+    text-align:left;
+    vertical-align:top;
+  }
+  table.ln-table th {
+    font-weight:600;
+    color:#475569;
+    white-space:nowrap;
+  }
+  table.ln-table tbody tr:nth-child(even) {
+    background:#f9fafb;
+  }
+  table.ln-table tbody tr:hover {
+    background:#eff6ff;
+  }
+
+  .amount-cell {
+    text-align:right;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+
+  .badge-ln-ok {
+    display:inline-flex;
+    padding:2px 8px;
+    border-radius:999px;
+    font-size:0.8rem;
+    background:#dcfce7;
+    color:#166534;
+  }
+  .badge-ln-missing {
+    display:inline-flex;
+    padding:2px 8px;
+    border-radius:999px;
+    font-size:0.8rem;
+    background:#fee2e2;
+    color:#b91c1c;
+  }
+
+  .upload-form {
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .upload-form input[type="file"] {
+    font-size:0.82rem;
+  }
+  .btn-upload {
+    display:inline-block;
+    padding:4px 9px;
+    border-radius:999px;
+    border:1px solid #d1d5db;
+    background:#e5e7eb;
+    font-size:0.8rem;
+    cursor:pointer;
+  }
+  .btn-upload:hover {
+    background:#d4d4d8;
+  }
+
+  .link-ln {
+    color:#2563eb;
+    font-size:0.85rem;
+    text-decoration:none;
+  }
+  .link-ln:hover {
+    text-decoration:underline;
+  }
+</style>
+
+<div class="page-header">
+  <div>
+    <h2>Leistungsnachweise</h2>
+    <small>Zu jeder gesendeten Abrechnung den unterschriebenen Leistungsnachweis hinterlegen.</small>
+  </div>
+</div>
+
+<section class="card">
+  <h3>Gesendete Abrechnungen</h3>
+  <p class="card-subtitle">
+    Hier siehst du alle bereits versendeten Abrechnungen. Lade den unterschriebenen Leistungsnachweis (PDF) hoch,
+    damit er im Archiv beim jeweiligen Patienten verfügbar ist. Nach dem Upload wird automatisch der vollständige
+    Leistungsnachweis (Empfang + Unterschrift zwei) erzeugt.
+  </p>
+
+  {% if items %}
+    <div class="table-wrap">
+      <table class="ln-table">
+        <thead>
+          <tr>
+            <th>Abrechnungs-ID</th>
+            <th>Patient</th>
+            <th>Monat</th>
+            <th>Pflegekasse</th>
+            <th>Gesendet am</th>
+            <th>Leistungsnachweis</th>
+            <th>Kassenversion</th>
+            <th>Upload</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+          {% set a = item.abr %}
+          <tr>
+            <td>{{ a.id }}</td>
+            <td>{{ a.patient.name if a.patient else "-" }}</td>
+            <td>{{ a.abrechnungsmonat }}</td>
+            <td>{{ a.kasse.name if a.kasse else "-" }}</td>
+            <td>
+              {% if a.gesendet_am %}
+                {{ a.gesendet_am.strftime("%d.%m.%Y %H:%M") }}
+              {% else %}
+                –
+              {% endif %}
+            </td>
+
+            <!-- Original Leistungsnachweis -->
+            <td>
+              {% if item.ln_exists %}
+                <span class="badge-ln-ok">vorhanden</span><br>
+                <a href="{{ item.ln_url }}" class="link-ln" target="_blank">
+                  Öffnen
+                </a>
+              {% else %}
+                <span class="badge-ln-missing">noch nicht hochgeladen</span>
+              {% endif %}
+            </td>
+
+            <!-- Neuer Kombinierter Leistungsnachweis -->
+            <td>
+              {% if item.combined_exists %}
+                <span class="badge-ln-ok">vorhanden</span><br>
+                <a href="{{ item.combined_url }}" class="link-ln" target="_blank">
+                  Download
+                </a>
+              {% else %}
+                <span class="badge-ln-missing">noch nicht erzeugt</span>
+              {% endif %}
+            </td>
+
+            <!-- Upload -->
+            <td>
+              <form class="upload-form"
+                    method="post"
+                    action="/leistungsnachweise/{{ a.id }}/upload"
+                    enctype="multipart/form-data">
+                <input type="file" name="ln_pdf" accept="application/pdf" required>
+                <button type="submit" class="btn-upload">
+                  Hochladen / ersetzen
+                </button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="card-subtitle" style="margin-top:0.4rem;">
+      Es sind noch keine gesendeten Abrechnungen vorhanden.
+    </p>
+  {% endif %}
+</section>
+
+{% endblock %}

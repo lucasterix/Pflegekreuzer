@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Begleitzettel Pflegehilfsmittel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      margin: 20px;
+    }
+    .begleitzettel {
+      font-size: 12px;
+    }
+    .bz-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .bz-box {
+      border: 1px solid #000;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .bz-title {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      margin-top: 0.5rem;
+      text-transform: uppercase;
+    }
+    table.bz-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    table.bz-table th,
+    table.bz-table td {
+      border: 1px solid #000;
+      padding: 4px;
+    }
+    .bz-small {
+      font-size: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="begleitzettel">
+  <div class="bz-title">Begleitzettel zur Abrechnung Pflegehilfsmittel</div>
+
+  <div class="bz-header">
+    <div class="bz-box" style="width: 48%;">
+      <strong>Leistungserbringer (Absender)</strong><br>
+      {% if cfg and cfg.name %}{{ cfg.name }}{% else %}(Name nicht gepflegt){% endif %}<br>
+      {% if cfg and cfg.strasse %}{{ cfg.strasse }}<br>{% endif %}
+      {% if cfg and cfg.plz %}{{ cfg.plz }}{% endif %}
+      {% if cfg and cfg.ort %} {{ cfg.ort }}{% endif %}<br>
+      IK: {{ sender_ik or '-' }}<br>
+      KIM: {% if cfg and cfg.kim_adresse %}{{ cfg.kim_adresse }}{% else %}-{% endif %}
+    </div>
+
+    <div class="bz-box" style="width: 48%;">
+      <strong>Empfänger (Pflegekasse / Annahmestelle)</strong><br>
+      {% if kasse %}
+        {{ kasse.name }}<br>
+        {% if kasse.address %}{{ kasse.address }}<br>{% endif %}
+        IK: {{ empfaenger_ik or (kasse.ik or '-') }}
+      {% else %}
+        (keine Kasse hinterlegt)
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="bz-box">
+    <strong>Abrechnungsdaten</strong><br>
+    Abrechnungs-ID: {{ abrechnung.id }}<br>
+    Abrechnungsmonat: {{ abrechnung.abrechnungsmonat }}<br>
+    Versandzeitpunkt: {{ erstellungsdatum[6:8] }}.{{ erstellungsdatum[4:6] }}.{{ erstellungsdatum[0:4] }}
+    um {{ erstellungszeit[0:2] }}:{{ erstellungszeit[2:4] }} Uhr<br>
+    Transfername (TA1): {{ transfername }}<br>
+    Zugehörige Dateien: {{ xml_filename }}, {{ auf_filename }}
+  </div>  
+
+  <div class="bz-box">
+    <strong>Versicherte Person</strong><br>
+    {% if patient %}
+      Name: {{ patient.name }}<br>
+      Versichertennummer: {{ patient.versichertennummer }}<br>
+      {% if patient.address %}Adresse: {{ patient.address }}<br>{% endif %}
+    {% else %}
+      (kein Patient zugeordnet)
+    {% endif %}
+  </div>
+
+  <div class="bz-box">
+    <strong>Abgerechnete Pflegehilfsmittel</strong>
+    <table class="bz-table">
+      <thead>
+        <tr>
+          <th>Pos.</th>
+          <th>Bezeichnung</th>
+          <th>Positionsnummer</th>
+          <th>Menge</th>
+          <th>Preis/Packung</th>
+          <th>Betrag</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set gesamt = 0 %}
+        {% for pos in positionen %}
+          {% set gesamt = gesamt + pos.betrag_gesamt %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ pos.hilfsmittel.bezeichnung }}</td>
+            <td>{{ pos.hilfsmittel.positionsnummer }}</td>
+            <td>{{ pos.menge }}</td>
+            <td>{{ "%.2f"|format(pos.einzelpreis) }} €</td>
+            <td>{{ "%.2f"|format(pos.betrag_gesamt) }} €</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="5" style="text-align:right;">Gesamtbetrag</th>
+          <th>{{ "%.2f"|format(abrechnung.gesamt_betrag) }} €</th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="bz-box bz-small">
+    <strong>Hinweis:</strong><br>
+    Dieser Begleitzettel wird der elektronischen Abrechnung als Übersicht beigefügt. 
+    Maßgeblich für die maschinelle Verarbeitung sind die übermittelten Datensätze 
+    (AUF, EDIFACT/PKCS#7, XML gem. PFL_DAT/PFL_ABR).
+  </div>
+</div>
+
+</body>
+</html>

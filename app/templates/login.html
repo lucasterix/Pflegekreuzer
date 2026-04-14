@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .login-wrapper {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:60vh;
+  }
+  .login-card {
+    background:#ffffff;
+    border-radius:12px;
+    border:1px solid #e2e8f0;
+    padding:24px 26px;
+    max-width:380px;
+    width:100%;
+    box-shadow:0 6px 18px rgba(15,23,42,0.08);
+  }
+  .login-card h2 {
+    margin-top:0;
+    margin-bottom:6px;
+    font-size:1.5rem;
+  }
+  .login-card p.sub {
+    margin:0 0 14px;
+    color:#64748b;
+    font-size:0.9rem;
+  }
+  .form-row {
+    margin-bottom:0.8rem;
+  }
+  .form-row label {
+    display:block;
+    font-size:0.9rem;
+    color:#334155;
+    margin-bottom:0.2rem;
+  }
+  .form-row input[type="text"],
+  .form-row input[type="password"] {
+    width:100%;
+    padding:8px 10px;
+    border-radius:7px;
+    border:1px solid #cbd5e1;
+    font-size:0.95rem;
+  }
+  .form-row input:focus {
+    outline:none;
+    border-color:#3b82f6;
+    box-shadow:0 0 0 1px rgba(59,130,246,0.25);
+  }
+  .btn-primary {
+    width:100%;
+    padding:9px 0;
+    border-radius:999px;
+    border:none;
+    background:#2563eb;
+    color:#fff;
+    font-size:0.95rem;
+    font-weight:600;
+    cursor:pointer;
+    margin-top:6px;
+  }
+  .btn-primary:hover {
+    background:#1d4ed8;
+  }
+  .login-error {
+    background:#fee2e2;
+    color:#b91c1c;
+    border-radius:8px;
+    padding:6px 9px;
+    font-size:0.85rem;
+    margin-bottom:10px;
+  }
+</style>
+
+<div class="login-wrapper">
+  <div class="login-card">
+    <h2>Login</h2>
+    <p class="sub">Bitte melde dich mit deinen Zugangsdaten an.</p>
+
+    {% if error %}
+      <div class="login-error">
+        {{ error }}
+      </div>
+    {% endif %}
+
+    <form method="post" action="/login">
+      <div class="form-row">
+        <label for="username">Benutzername</label>
+        <input type="text"
+               id="username"
+               name="username"
+               autocomplete="username"
+               required
+               value="">
+      </div>
+
+      <div class="form-row">
+        <label for="password">Passwort</label>
+        <input type="password"
+               id="password"
+               name="password"
+               autocomplete="current-password"
+               required>
+      </div>
+
+      <button type="submit" class="btn-primary">
+        Anmelden
+      </button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

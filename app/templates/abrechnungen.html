@@ -1,0 +1,1117 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .page-header {
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:1rem;
+  }
+  .page-header h2 {
+    margin:0;
+    font-size:1.7rem;
+  }
+  .page-header small {
+    color:#4a5568;
+    font-size:0.9rem;
+  }
+
+  .card {
+    background:#ffffff;
+    border-radius:10px;
+    border:1px solid #e2e8f0;
+    padding:16px 18px;
+    box-shadow:0 2px 4px rgba(15,23,42,0.04);
+    margin-bottom:1rem;
+  }
+
+  .card h3 {
+    margin-top:0;
+    margin-bottom:0.4rem;
+    font-size:1.2rem;
+  }
+  .card-subtitle {
+    margin:0 0 0.8rem;
+    font-size:0.9rem;
+    color:#64748b;
+  }
+
+  .form-inline {
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+  }
+  .form-inline label {
+    font-size:0.9rem;
+    color:#334155;
+  }
+  .form-inline input[type="text"],
+  .form-inline input[type="month"] {
+    padding:6px 8px;
+    border-radius:6px;
+    border:1px solid #cbd5e1;
+    font-size:0.95rem;
+    margin-left:4px;
+  }
+  .form-inline input:focus {
+    outline:none;
+    border-color:#3b82f6;
+    box-shadow:0 0 0 1px rgba(59,130,246,0.25);
+  }
+
+  .btn-primary {
+    display:inline-block;
+    padding:7px 12px;
+    border-radius:999px;
+    background:#2563eb;
+    color:#fff;
+    border:none;
+    font-size:0.9rem;
+    cursor:pointer;
+  }
+  .btn-primary:hover {
+    background:#1d4ed8;
+  }
+
+  .btn-secondary {
+    padding:6px 10px;
+    border-radius:999px;
+    background:#e5e7eb;
+    color:#111827;
+    border:1px solid #d1d5db;
+    font-size:0.85rem;
+    cursor:pointer;
+  }
+  .btn-secondary:hover {
+    background:#d4d4d8;
+  }
+
+  .btn-start-abrechnung {
+    padding:5px 10px;
+    border-radius:999px;
+    border:1px solid #2563eb;
+    background:#eff6ff;
+    color:#1d4ed8;
+    font-size:0.85rem;
+    cursor:pointer;
+  }
+  .btn-start-abrechnung:hover {
+    background:#dbeafe;
+  }
+
+  .small-hint {
+    font-size:0.9rem;
+    color:#6b7280;
+    margin-top:0.3rem;
+  }
+
+  /* Tabellen */
+  .table-wrap {
+    margin-top:0.3rem;
+    overflow-x:auto;
+  }
+  table.simple-table {
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.9rem;
+  }
+  table.simple-table thead tr {
+    background:#f8fafc;
+  }
+  table.simple-table th,
+  table.simple-table td {
+    padding:8px 10px;
+    border-bottom:1px solid #e2e8f0;
+    text-align:left;
+    vertical-align:top;
+  }
+  table.simple-table th {
+    font-weight:600;
+    color:#475569;
+    white-space:nowrap;
+  }
+  table.simple-table tbody tr:nth-child(even) {
+    background:#f9fafb;
+  }
+  table.simple-table tbody tr:hover {
+    background:#eff6ff;
+  }
+
+  .pill {
+    display:inline-flex;
+    padding:2px 8px;
+    border-radius:999px;
+    font-size:0.78rem;
+    background:#e0f2fe;
+    color:#0369a1;
+  }
+
+  /* Formular "Neue Abrechnung" */
+  #abrechnung-form label {
+    font-size:0.9rem;
+    color:#334155;
+  }
+  #abrechnung-form input[type="text"],
+  #abrechnung-form select,
+  #abrechnung-form input[type="number"],
+  #abrechnung-form input[type="date"] {
+    padding:6px 8px;
+    border-radius:6px;
+    border:1px solid #cbd5e1;
+    font-size:0.9rem;
+  }
+  #abrechnung-form input[type="text"]:focus,
+  #abrechnung-form select:focus,
+  #abrechnung-form input[type="number"]:focus,
+  #abrechnung-form input[type="date"]:focus {
+    outline:none;
+    border-color:#3b82f6;
+    box-shadow:0 0 0 1px rgba(59,130,246,0.25);
+  }
+
+  fieldset {
+    border-radius:8px;
+    border:1px solid #e5e7eb;
+    padding:0.7rem 0.9rem 0.9rem;
+  }
+  fieldset legend {
+    font-size:0.95rem;
+    font-weight:600;
+    padding:0 0.25rem;
+  }
+
+  #patient-search {
+    padding:6px 8px;
+    border-radius:999px;
+    border:1px solid #cbd5e1;
+    font-size:0.9rem;
+  }
+
+  button.remove-row {
+    padding:3px 8px;
+    border-radius:999px;
+    border:1px solid #ef4444;
+    background:#fee2e2;
+    color:#b91c1c;
+    cursor:pointer;
+  }
+  button.remove-row:hover {
+    background:#fecaca;
+  }
+
+  button[disabled] {
+    opacity:0.6;
+    cursor:not-allowed;
+  }
+
+  /* Hinweis über 42 € */
+  #betrag-hinweis {
+    color:#b91c1c;
+    font-size:0.85rem;
+    margin-top:0.2rem;
+    display:none;
+  }
+</style>
+
+<div class="page-header">
+  <div>
+    <h2>Abrechnungen</h2>
+    <small>Abrechnungsmonate verwalten, neue Abrechnungen anlegen und exportieren.</small>
+  </div>
+</div>
+
+<!-- 1) Monatswahl -->
+<div class="card">
+  <form method="get" action="/abrechnungen" class="form-inline">
+    <label>
+      Abrechnungsmonat (yyyy-mm):
+      <input type="text" name="monat" value="{{ monat }}" placeholder="2025-03" style="width:120px;">
+    </label>
+    <button type="submit" class="btn-primary">Anzeigen</button>
+  </form>
+  <p class="small-hint">
+    Aktueller Monat:
+    <strong>{{ monat }}</strong>
+  </p>
+</div>
+
+<!-- 2) Offene Patienten für diesen Monat -->
+<div class="card">
+  <h3>Offene Patienten für {{ monat }}</h3>
+  <p class="card-subtitle">
+    Patienten, für die im gewählten Monat noch keine vollständige Abrechnung angelegt wurde.
+  </p>
+
+  {% if offene_patients %}
+    <div class="table-wrap">
+      <table class="simple-table">
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Pflegekasse</th>
+            <th>Letzter abgerechneter Monat</th>
+            <th>Aktion</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for p in offene_patients %}
+          <tr>
+            <td>{{ p.name }}</td>
+            <td>{{ p.kasse.name if p.kasse else "-" }}</td>
+            <td>
+              {% if p.letzter_abrechnungsmonat %}
+                {{ p.letzter_abrechnungsmonat }}
+              {% else %}
+                <span class="pill">Noch nie abgerechnet</span>
+              {% endif %}
+            </td>
+            <td>
+              <button
+                type="button"
+                class="btn-start-abrechnung"
+                data-patient-id="{{ p.id }}"
+                data-patient-name="{{ p.name }}"
+                data-kasse-name="{{ p.kasse.name if p.kasse else '' }}"
+              >
+                Abrechnung anlegen
+              </button>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="card-subtitle" style="margin-top:0.2rem;">
+      Keine offenen Patienten für {{ monat }} – alle erfasst oder keine Patienten vorhanden.
+    </p>
+  {% endif %}
+</div>
+
+<!-- 3) Neue Abrechnung anlegen -->
+<div class="card">
+  <h3>Neue Abrechnung anlegen</h3>
+  <p class="card-subtitle">
+    Wähle einen Patienten, lege die Hilfsmittelpositionen fest und speichere die Abrechnung.
+  </p>
+
+  <form method="post" action="/abrechnungen" id="abrechnung-form">
+    <div style="margin-bottom:0.6rem;">
+      <label>
+        Patient (Tippen zum Suchen):<br>
+        <input
+          type="text"
+          id="patient-search"
+          placeholder="Patientennamen tippen …"
+          style="width:260px;margin-bottom:4px;"
+        ><br>
+
+        <select name="patient_id" id="patient-select" required style="width:260px;">
+          <option value="">-- bitte auswählen --</option>
+
+          {% if offene_patients %}
+            <optgroup label="Noch nicht abgerechnet in {{ monat }}">
+              {% for p in offene_patients %}
+                <option
+                  value="{{ p.id }}"
+                  data-kasse="{{ p.kasse.name if p.kasse else '' }}"
+                  data-first="{{ '1' if not p.letzter_abrechnungsmonat else '0' }}"
+                  data-has-abr-monat="0"
+                  data-has-signed="{{ '1' if p.unterschriebener_antrag else '0' }}"
+                  data-has-antrag="{{ '1' if p.antrag_generiert else '0' }}"
+                >
+                  {{ p.name }}
+                </option>
+              {% endfor %}
+            </optgroup>
+          {% endif %}
+
+          {% if bereits_abgerechnete_patients %}
+            <optgroup label="Bereits abgerechnet in {{ monat }}">
+              {% for p in bereits_abgerechnete_patients %}
+                <option
+                  value="{{ p.id }}"
+                  data-kasse="{{ p.kasse.name if p.kasse else '' }}"
+                  data-first="0"
+                  data-has-abr-monat="1"
+                >
+                  {{ p.name }}
+                </option>
+              {% endfor %}
+            </optgroup>
+          {% endif %}
+        </select>
+      </label>
+    </div>
+
+    <p style="margin-top:0.2rem;">
+      Zugehörige Pflegekasse:
+      <strong><span id="kasse-name">–</span></strong>
+    </p>
+
+    <div style="margin:0.6rem 0 1rem;">
+      <label>
+        Abrechnungsmonat (yyyy-mm):<br>
+        <input
+          type="text"
+          name="abrechnungsmonat"
+          id="abrechnungsmonat-input"
+          value="{{ monat }}"
+          placeholder="2025-03"
+          required
+        >
+      </label>
+    </div>
+
+    <!-- Hidden: alte Abrechnung im Monat stornieren? -->
+    <input type="hidden" name="storniere_alt" id="storniere-alt-input" value="0">
+
+    <fieldset>
+      <legend>Pflegehilfsmittel</legend>
+      <div class="table-wrap">
+        <table class="simple-table">
+          <thead>
+            <tr>
+              <th>Hilfsmittel</th>
+              <th>Menge (Packungen)</th>
+              <th>Aktion</th>
+            </tr>
+          </thead>
+          <tbody id="positions-body">
+            <tr class="position-row">
+              <td>
+                <select name="hilfsmittel_id">
+                  <option value="">-- bitte auswählen --</option>
+                  {% for h in hilfsmittel %}
+                    <option
+                      value="{{ h.id }}"
+                      data-name="{{ h.bezeichnung }}"
+                      data-price="{{ '%.2f'|format(h.preis_brutto) }}"
+                    >
+                      {{ h.bezeichnung }} ({{ "%.2f"|format(h.preis_brutto) }} € / Packung)
+                    </option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <input type="number" name="menge" min="1" step="1" value="1">
+              </td>
+              <td>
+                <button type="button" class="remove-row">−</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <button type="button" id="add-position" class="btn-secondary" style="margin-top:0.4rem;">
+        + Position hinzufügen
+      </button>
+      <p class="small-hint">
+        Leere Zeilen oder Menge &lt;= 0 werden bei der Abrechnung ignoriert.
+      </p>
+      <p id="betrag-hinweis">
+        Hinweis: Der Gesamtbetrag der ausgewählten Hilfsmittel überschreitet 42,00&nbsp;€.
+      </p>
+    </fieldset>
+
+    <!-- 🔹 Beratung + Antrag Krankenkasse (nur bei Erstabrechnung) -->
+    <fieldset id="erstberatung-block" style="margin-top:1rem; display:none;">
+      <legend>Beratung &amp; Antrag bei Erstabrerechnung</legend>
+
+      <div class="table-wrap">
+        <table class="simple-table">
+          <tbody>
+            <tr>
+              <th style="width:240px;">Datum des Beratungsgesprächs</th>
+              <td>
+                <input
+                  type="date"
+                  id="beratung-datum"
+                  name="beratung_datum"
+                >
+              </td>
+            </tr>
+            <tr>
+              <th>Beratender Mitarbeiter</th>
+              <td>
+                <input
+                  type="text"
+                  id="beratung-mitarbeiter"
+                  name="beratung_mitarbeiter"
+                  placeholder="Name des Mitarbeiters"
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="small-hint">
+        Diese Angaben werden benötigt, um den Erstantrag für die Krankenkasse zu dokumentieren.
+      </p>
+
+      <button
+        type="button"
+        id="btn-antrag"
+        class="btn-secondary"
+        disabled
+      >
+        Antrag Krankenkasse generieren
+      </button>
+    </fieldset>
+
+    <div style="margin-top:1rem;">
+      <button type="submit" class="btn-primary" id="btn-save-abrechnung" disabled>
+        Abrechnung speichern
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- 4) Abrechnungen für diesen Monat -->
+<div class="card">
+  <h3>Abrechnungen für {{ monat }}</h3>
+
+  {% if abrechnungen_monat %}
+    <div class="table-wrap">
+      <table class="simple-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Patient</th>
+            <th>Kasse</th>
+            <th>Monat</th>
+            <th>Gesamtbetrag</th>
+            <th>Anzahl Positionen</th>
+            <th>Export XML</th>
+            <th>Export Rechnung</th>
+            <th>Storno</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for a in abrechnungen_monat %}
+          <tr>
+            <td>{{ a.id }}</td>
+            <td>{{ a.patient.name }}</td>
+            <td>{{ a.kasse.name if a.kasse else '-' }}</td>
+            <td>{{ a.abrechnungsmonat }}</td>
+            <td>{{ "%.2f"|format(a.gesamt_betrag) }} €</td>
+            <td>{{ a.positionen|length }}</td>
+            <td>
+              <a href="/abrechnungen/{{ a.id }}/export">XML exportieren</a>
+            </td>
+            <td>
+              <a href="/abrechnungen/{{ a.id }}/rechnung">Rechnung (PDF)</a>
+            </td>
+            <td>
+              <form
+                method="post"
+                action="/abrechnungen/{{ a.id }}/storno"
+                onsubmit="return confirm('Abrechnung {{ a.id }} wirklich stornieren?');"
+              >
+                <input type="hidden" name="monat" value="{{ monat }}">
+                <button type="submit" class="btn-secondary">Stornieren</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="card-subtitle" style="margin-top:0.4rem;">
+      Keine Abrechnungen für {{ monat }}.
+    </p>
+  {% endif %}
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const positionsBody   = document.getElementById("positions-body");
+  const addBtn          = document.getElementById("add-position");
+  const patientSelect   = document.getElementById("patient-select");
+  const patientSearch   = document.getElementById("patient-search");
+  const kasseSpan       = document.getElementById("kasse-name");
+  const abrechnungForm  = document.getElementById("abrechnung-form");
+
+  const erstBlock           = document.getElementById("erstberatung-block");
+  const beratungDatum       = document.getElementById("beratung-datum");
+  const beratungMitarbeiter = document.getElementById("beratung-mitarbeiter");
+  const btnAntrag           = document.getElementById("btn-antrag");
+  const btnSave             = document.getElementById("btn-save-abrechnung");
+  const stornoHidden        = document.getElementById("storniere-alt-input");
+  const betragHinweis       = document.getElementById("betrag-hinweis");
+
+  let currentFirstTime   = false;
+  let currentPatientId   = null;
+  let hasGeneratedAntrag = false;
+
+  // Alle Patient-Optionen sichern
+  const allPatientOptions = [];
+  for (let i = 0; i < patientSelect.options.length; i++) {
+    allPatientOptions.push(patientSelect.options[i]);
+  }
+
+  // =========================
+  // Hilfsfunktionen
+  // =========================
+  function updateKasseName() {
+    const opt = patientSelect.options[patientSelect.selectedIndex];
+    if (!opt || !opt.value) {
+      kasseSpan.textContent = "–";
+      return;
+    }
+    const name = opt.getAttribute("data-kasse") || "–";
+    kasseSpan.textContent = name || "–";
+  }
+
+  function isSelectedFirstTime() {
+    const opt = patientSelect.options[patientSelect.selectedIndex];
+    if (!opt || !opt.value) return false;
+    return opt.getAttribute("data-first") === "1";
+  }
+
+  function hasAtLeastOnePositionSelected() {
+    const rows = positionsBody.querySelectorAll(".position-row");
+    for (const row of rows) {
+      const hm  = row.querySelector('select[name="hilfsmittel_id"]');
+      const qty = row.querySelector('input[name="menge"]');
+      if (!hm || !qty) continue;
+      const qtyVal = parseInt(qty.value || "0", 10);
+      if (hm.value && qtyVal > 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Gesamtbetrag berechnen (aus data-price * Menge)
+  function calculateTotal() {
+    let total = 0;
+    const rows = positionsBody.querySelectorAll(".position-row");
+    rows.forEach((row) => {
+      const sel = row.querySelector('select[name="hilfsmittel_id"]');
+      const qtyInput = row.querySelector('input[name="menge"]');
+      if (!sel || !qtyInput) return;
+      if (!sel.value) return;
+
+      const opt = sel.selectedOptions[0];
+      if (!opt) return;
+
+      const priceStr = opt.getAttribute("data-price");
+      if (!priceStr) return;
+
+      const price = parseFloat(String(priceStr).replace(",", "."));
+      if (isNaN(price)) return;
+
+      const qty = parseInt(qtyInput.value || "0", 10);
+      if (qty <= 0) return;
+
+      total += price * qty;
+    });
+    return total;
+  }
+
+  function updateBetragHinweis() {
+    if (!betragHinweis) return;
+    const total = calculateTotal();
+    if (total > 42) {
+      betragHinweis.style.display = "block";
+    } else {
+      betragHinweis.style.display = "none";
+    }
+  }
+
+  function collectProdukteFromForm() {
+    const produkte = {};
+    const rows = positionsBody.querySelectorAll(".position-row");
+
+    rows.forEach((row) => {
+      const sel = row.querySelector('select[name="hilfsmittel_id"]');
+      const qtyInput = row.querySelector('input[name="menge"]');
+      if (!sel || !qtyInput) return;
+
+      const qtyVal = parseInt(qtyInput.value || "0", 10);
+      if (!sel.value || qtyVal <= 0) return;
+
+      const opt = sel.selectedOptions[0];
+      let hmName = opt ? (opt.getAttribute("data-name") || opt.textContent || "") : "";
+      hmName = opt ? (opt.getAttribute("data-name") || "").trim() : "";
+      if (!hmName) return;
+
+      produkte[hmName] = (produkte[hmName] || 0) + qtyVal;
+    });
+
+    return produkte;
+  }
+
+  function updateAntragButtonState() {
+    if (!btnAntrag) return;
+    const hasDate  = beratungDatum && beratungDatum.value.trim() !== "";
+    const hasStaff = beratungMitarbeiter && beratungMitarbeiter.value.trim() !== "";
+    const hasPos   = hasAtLeastOnePositionSelected();
+
+    // Antrag nur bei Erstabrechnung und nur, wenn alles gefüllt ist
+    btnAntrag.disabled = !(
+      currentFirstTime &&
+      currentPatientId &&
+      hasDate &&
+      hasStaff &&
+      hasPos
+    );
+  }
+
+  function updateSaveButtonState() {
+  const hasPatient = !!patientSelect.value;
+  const hasPos     = hasAtLeastOnePositionSelected();
+  const opt        = patientSelect.options[patientSelect.selectedIndex];
+
+  let needsAntrag = currentFirstTime;
+  let okAntrag    = false;
+
+  // Prüfe, ob Antrag bereits im Backend erzeugt wurde
+  const hasAntrag = opt && opt.getAttribute("data-has-antrag") === "1";
+
+  // Wenn Antrag schon vorhanden → gilt automatisch als ok
+  if (hasAntrag) {
+    hasGeneratedAntrag = true;
+    okAntrag = true;
+  } else {
+    okAntrag = !needsAntrag || hasGeneratedAntrag;
+  }
+
+  // Nur speichern, wenn Patient + Positionen + ggf. Antrag
+  btnSave.disabled = !(hasPatient && hasPos && okAntrag);
+}
+
+  function updateErstberatungVisibility() {
+    const opt = patientSelect.options[patientSelect.selectedIndex];
+    if (opt && opt.value) {
+      currentPatientId = opt.value;
+    } else {
+      currentPatientId = null;
+    }
+
+    currentFirstTime = isSelectedFirstTime();
+
+    // Zusätzliche Daten aus den <option>-Attributen lesen
+    const hasSigned = opt && opt.getAttribute("data-has-signed") === "1";
+    const hasAntrag = opt && opt.getAttribute("data-has-antrag") === "1";
+
+    // Wenn im Backend (Export) bereits ein Antrag erfolgreich erzeugt wurde,
+    // soll der Speichern-Button direkt aktivierbar sein
+    hasGeneratedAntrag = hasAntrag;
+
+    // 🔹 Sichtbarkeit des Beratungsblocks:
+    // Zeige ihn bei Erstabrechnung immer, egal ob unterschriebener Antrag existiert oder nicht
+    if (erstBlock) {
+      if (currentFirstTime) {
+        erstBlock.style.display = "";
+      } else {
+        erstBlock.style.display = "none";
+      }
+    }
+
+    updateAntragButtonState();
+    updateSaveButtonState();
+  }
+
+  // =========================
+  // Event Handler
+  // =========================
+  patientSelect.addEventListener("change", function () {
+    if (patientSelect.selectedIndex >= 0) {
+      patientSearch.value = patientSelect.options[patientSelect.selectedIndex].text.trim();
+    }
+    updateKasseName();
+    updateErstberatungVisibility();
+  });
+
+  updateKasseName();
+  updateErstberatungVisibility();
+
+  // Patientensuche
+  patientSearch.addEventListener("input", function () {
+    const q = patientSearch.value.toLowerCase().trim();
+
+    patientSelect.innerHTML = "";
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "-- bitte auswählen --";
+    patientSelect.appendChild(placeholder);
+
+    let firstMatchValue = null;
+
+    allPatientOptions.forEach(function (o) {
+      if (!o.value) return;
+      if (!q || o.text.toLowerCase().indexOf(q) !== -1) {
+        const clone = o.cloneNode(true);
+        patientSelect.appendChild(clone);
+        if (!firstMatchValue) {
+          firstMatchValue = clone.value;
+        }
+      }
+    });
+
+    if (firstMatchValue) {
+      patientSelect.value = firstMatchValue;
+    } else {
+      patientSelect.value = "";
+    }
+
+    updateKasseName();
+    updateErstberatungVisibility();
+  });
+
+  // Erstberatungs-Felder beobachten
+  if (beratungDatum) {
+    beratungDatum.addEventListener("input", function () {
+      updateAntragButtonState();
+      updateSaveButtonState();
+    });
+  }
+  if (beratungMitarbeiter) {
+    beratungMitarbeiter.addEventListener("input", function () {
+      updateAntragButtonState();
+      updateSaveButtonState();
+    });
+  }
+
+  // =========================
+  // Antrag generieren Button
+  // =========================
+  btnAntrag.addEventListener("click", () => {
+    if (btnAntrag.disabled || !currentPatientId) return;
+
+    const opt = patientSelect.options[patientSelect.selectedIndex];
+    const hasSigned = opt && opt.getAttribute("data-has-signed") === "1";
+
+    if (!hasSigned) {
+      const info = document.createElement("p");
+      info.textContent =
+        "⚠️ Bitte lade den unterschriebenen Antrag zuerst bei diesem Patienten hoch, bevor du den Krankenkassenantrag erzeugst.";
+      info.style.color = "#b91c1c";
+      info.style.marginTop = "0.5rem";
+      erstBlock.appendChild(info);
+      return;
+    }
+
+    const produkte = collectProdukteFromForm();
+    if (!Object.keys(produkte).length) {
+      alert("Bitte zuerst mindestens ein Pflegehilfsmittel mit Menge > 0 erfassen.");
+      return;
+    }
+
+    const monatInput = document.getElementById("abrechnungsmonat-input");
+    const monatValue = monatInput ? monatInput.value.trim() : "";
+
+    const params = new URLSearchParams();
+    if (monatValue) params.append("monat", monatValue);
+    if (beratungDatum && beratungDatum.value) params.append("beratung_datum", beratungDatum.value);
+    if (beratungMitarbeiter && beratungMitarbeiter.value) params.append("beratung_mitarbeiter", beratungMitarbeiter.value);
+
+    params.append("produkte_json", JSON.stringify(produkte));
+
+    // PDF generieren
+    const baseUrl = `/patients/${currentPatientId}`;
+    const query = params.toString();
+    const antragUrl = baseUrl + "/antrag_komplett?" + query;
+    window.open(antragUrl, "_blank");
+
+    // Nach dem Öffnen des PDFs → als erfolgreich markieren
+    setTimeout(() => {
+      hasGeneratedAntrag = true;
+      updateSaveButtonState();
+
+      // Hinweistext unter dem Button anzeigen (statt Pop-up)
+      const hint = document.createElement("p");
+      hint.textContent = "✅ Antrag erfolgreich generiert und im Export gespeichert. Sie können jetzt die Abrechnung speichern.";
+      hint.style.color = "#166534";
+      hint.style.marginTop = "0.5rem";
+      erstBlock.appendChild(hint);
+    }, 1200);
+  });
+
+  // Initialer State
+  updateAntragButtonState();
+  updateSaveButtonState();
+  updateBetragHinweis();
+
+  function attachRemoveHandlers() {
+    const buttons = positionsBody.querySelectorAll(".remove-row");
+    buttons.forEach(function (btn) {
+      btn.onclick = function () {
+        const rows = positionsBody.querySelectorAll(".position-row");
+        if (rows.length > 1) {
+          this.closest("tr").remove();
+          updateAntragButtonState();
+          updateSaveButtonState();
+          updateBetragHinweis();
+        }
+      };
+    });
+  }
+
+  function attachPositionChangeHandlers() {
+    const elems = positionsBody.querySelectorAll('select[name="hilfsmittel_id"], input[name="menge"]');
+    elems.forEach(function (el) {
+      el.addEventListener("change", function () {
+        updateAntragButtonState();
+        updateSaveButtonState();
+        updateBetragHinweis();
+      });
+      el.addEventListener("input", function () {
+        updateAntragButtonState();
+        updateSaveButtonState();
+        updateBetragHinweis();
+      });
+    });
+  }
+
+  // =========================
+  // Event Handler
+  // =========================
+  patientSelect.addEventListener("change", function () {
+    if (patientSelect.selectedIndex >= 0) {
+      patientSearch.value = patientSelect.options[patientSelect.selectedIndex].text.trim();
+    }
+    updateKasseName();
+    updateErstberatungVisibility();
+  });
+
+  updateKasseName();
+  updateErstberatungVisibility();
+
+  // Patientensuche
+  patientSearch.addEventListener("input", function () {
+    const q = patientSearch.value.toLowerCase().trim();
+
+    patientSelect.innerHTML = "";
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "-- bitte auswählen --";
+    patientSelect.appendChild(placeholder);
+
+    let firstMatchValue = null;
+
+    allPatientOptions.forEach(function (o) {
+      if (!o.value) return;
+      if (!q || o.text.toLowerCase().indexOf(q) !== -1) {
+        const clone = o.cloneNode(true);
+        patientSelect.appendChild(clone);
+        if (!firstMatchValue) {
+          firstMatchValue = clone.value;
+        }
+      }
+    });
+
+    if (firstMatchValue) {
+      patientSelect.value = firstMatchValue;
+    } else {
+      patientSelect.value = "";
+    }
+
+    updateKasseName();
+    updateErstberatungVisibility();
+  });
+
+  // Formular-Submit (inkl. Storno-Logik + Erstabrechnungsprüfung)
+  abrechnungForm.addEventListener("submit", function (e) {
+    const q = (patientSearch.value || "").toLowerCase().trim();
+    let chosen = null;
+
+    if (q) {
+      allPatientOptions.forEach(function (o) {
+        if (!chosen && o.value && o.text.toLowerCase().indexOf(q) !== -1) {
+          chosen = o;
+        }
+      });
+    }
+
+    if (chosen) {
+      patientSelect.value = chosen.value;
+    }
+
+    if (!patientSelect.value) {
+      e.preventDefault();
+      alert("Bitte einen existierenden Patienten auswählen oder den Namen so tippen, dass er gefunden wird.");
+      return;
+    }
+
+    if (!hasAtLeastOnePositionSelected()) {
+      e.preventDefault();
+      alert("Bitte mindestens ein Pflegehilfsmittel mit Menge > 0 auswählen.");
+      return;
+    }
+
+    // Prüfen, ob in diesem Monat bereits eine Abrechnung existiert
+    const opt = patientSelect.options[patientSelect.selectedIndex];
+    const hasAbrMonat = opt && opt.getAttribute("data-has-abr-monat") === "1";
+
+    if (hasAbrMonat) {
+      const monatInput = document.getElementById("abrechnungsmonat-input");
+      const monatValue = monatInput ? (monatInput.value || "{{ monat }}") : "{{ monat }}";
+
+      const msg =
+        "Für diesen Patienten besteht bereits eine Abrechnung im Monat " +
+        monatValue +
+        ".\n\n" +
+        "Möchten Sie die bestehende Abrechnung stornieren und eine neue anlegen?";
+
+      const ok = window.confirm(msg);
+      if (!ok) {
+        e.preventDefault();
+        return;
+      }
+
+      if (stornoHidden) {
+        stornoHidden.value = "1";
+      }
+    } else {
+      if (stornoHidden) {
+        stornoHidden.value = "0";
+      }
+    }
+
+    // Bei Erstabrechnung: Antrag muss vorher erzeugt worden sein
+    if (currentFirstTime && !hasGeneratedAntrag) {
+      e.preventDefault();
+      alert("Bei der Erstabrechnung muss zuerst der Antrag für die Krankenkasse generiert werden.");
+      return;
+    }
+  });
+
+  // Positionen hinzufügen
+  addBtn.addEventListener("click", function () {
+    const rows = positionsBody.querySelectorAll(".position-row");
+    if (rows.length === 0) return;
+
+    const lastRow = rows[rows.length - 1];
+    const newRow  = lastRow.cloneNode(true);
+
+    const select   = newRow.querySelector('select[name="hilfsmittel_id"]');
+    const qtyInput = newRow.querySelector('input[name="menge"]');
+
+    if (select)   select.value = "";
+    if (qtyInput) qtyInput.value = "1";
+
+    positionsBody.appendChild(newRow);
+    attachRemoveHandlers();
+    attachPositionChangeHandlers();
+    updateAntragButtonState();
+    updateSaveButtonState();
+    updateBetragHinweis();
+  });
+
+  attachRemoveHandlers();
+  attachPositionChangeHandlers();
+
+  // Buttons aus "Offene Patienten"-Tabelle → Formular vorbelegen
+  const startButtons = document.querySelectorAll(".btn-start-abrechnung");
+  startButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      const pid  = this.getAttribute("data-patient-id");
+      const name = this.getAttribute("data-patient-name") || "";
+
+      const options = patientSelect.options;
+      for (let i = 0; i < options.length; i++) {
+        if (options[i].value === pid) {
+          options[i].selected = true;
+          break;
+        }
+      }
+
+      if (name) {
+        patientSearch.value = name;
+      }
+
+      updateKasseName();
+      updateErstberatungVisibility();
+
+      document
+        .getElementById("abrechnung-form")
+        .scrollIntoView({ behavior: "smooth" });
+    });
+  });
+
+  // Erstberatungs-Felder beobachten
+  if (beratungDatum) {
+    beratungDatum.addEventListener("input", function () {
+      updateAntragButtonState();
+      updateSaveButtonState();
+    });
+  }
+  if (beratungMitarbeiter) {
+    beratungMitarbeiter.addEventListener("input", function () {
+      updateAntragButtonState();
+      updateSaveButtonState();
+    });
+  }
+
+  btnAntrag.addEventListener("click", () => {
+  if (btnAntrag.disabled || !currentPatientId) return;
+
+  const opt = patientSelect.options[patientSelect.selectedIndex];
+  const hasSigned = opt && opt.getAttribute("data-has-signed") === "1";
+
+  if (!hasSigned) {
+    alert(
+      "⚠️ Für diesen Patienten wurde noch kein unterschriebener Antrag hochgeladen.\n\n" +
+      "Bitte lade den unterschriebenen Antrag zuerst auf der Seite 'Patienten' hoch, " +
+      "bevor du den Antrag für die Krankenkasse generierst."
+    );
+    return;
+  }
+
+  const produkte = collectProdukteFromForm();
+  if (!Object.keys(produkte).length) {
+    alert("Bitte zuerst mindestens ein Pflegehilfsmittel mit Menge > 0 erfassen.");
+    return;
+  }
+
+  const monatInput = document.getElementById("abrechnungsmonat-input");
+  const monatValue = monatInput ? monatInput.value.trim() : "";
+
+  const params = new URLSearchParams();
+  if (monatValue) {
+    params.append("monat", monatValue);
+  }
+  if (beratungDatum && beratungDatum.value) {
+    params.append("beratung_datum", beratungDatum.value);
+  }
+  if (beratungMitarbeiter && beratungMitarbeiter.value) {
+    params.append("beratung_mitarbeiter", beratungMitarbeiter.value);
+  }
+
+  params.append("produkte_json", JSON.stringify(produkte));
+
+  // Fenster öffnen (PDF generieren)
+  const baseUrl = `/patients/${currentPatientId}`;
+  const query   = params.toString();
+  const antragUrl = baseUrl + "/antrag_komplett?" + query;
+  window.open(antragUrl, "_blank");
+
+  // 🧠 Nach dem Öffnen des PDFs → PDF wird serverseitig gespeichert
+  // Wir gehen davon aus, dass es erfolgreich generiert wurde
+  // Nach kurzer Verzögerung aktivieren wir den Speichern-Button
+  setTimeout(() => {
+    hasGeneratedAntrag = true;
+    updateSaveButtonState();
+    alert("✅ Der Antrag wurde erfolgreich generiert und im Export-Archiv gespeichert.\nSie können nun die Abrechnung speichern.");
+  }, 1500);
+});
+
+  // Initialer State
+  updateAntragButtonState();
+  updateSaveButtonState();
+  updateBetragHinweis();
+});
+</script>
+
+{% endblock %}

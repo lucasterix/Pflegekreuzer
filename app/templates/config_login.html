@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .config-login-wrapper {
+    max-width: 420px;
+    margin: 0 auto;
+    margin-top: 24px;
+  }
+
+  .config-login-card {
+    background:#ffffff;
+    border-radius:12px;
+    border:1px solid #e2e8f0;
+    padding:26px 28px 28px;
+    box-shadow:0 4px 8px rgba(15,23,42,0.06);
+    position:relative;
+    overflow:hidden;
+  }
+
+  .config-login-card::before {
+    content:"⚙";
+    position:absolute;
+    right:16px;
+    top:12px;
+    font-size:26px;
+    opacity:0.12;
+  }
+
+  .config-login-title {
+    margin:0 0 4px 0;
+    font-size:1.4rem;
+  }
+
+  .config-login-sub {
+    margin:0 0 14px 0;
+    font-size:0.9rem;
+    color:#64748b;
+  }
+
+  .config-login-fun {
+    font-size:0.85rem;
+    color:#4b5563;
+    margin-bottom:10px;
+  }
+
+  .form-row {
+    margin-bottom:0.75rem;
+  }
+
+  .form-row label {
+    display:block;
+    font-size:0.9rem;
+    color:#334155;
+    margin-bottom:0.25rem;
+  }
+
+  .form-row input[type="password"] {
+    width:100%;
+    padding:8px 10px;
+    border-radius:8px;
+    border:1px solid #cbd5e1;
+    font-size:0.95rem;
+  }
+
+  .form-row input[type="password"]:focus {
+    outline:none;
+    border-color:#2563eb;
+    box-shadow:0 0 0 1px rgba(37,99,235,0.25);
+  }
+
+  .btn-primary {
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:8px 16px;
+    border-radius:999px;
+    border:none;
+    background:#2563eb;
+    color:#ffffff;
+    font-size:0.95rem;
+    cursor:pointer;
+    margin-top:4px;
+  }
+
+  .btn-primary:hover {
+    background:#1d4ed8;
+  }
+
+  .hint-line {
+    margin-top:10px;
+    font-size:0.8rem;
+    color:#94a3b8;
+  }
+
+  .error-text {
+    margin-top:10px;
+    font-size:0.86rem;
+    color:#b91c1c;
+  }
+</style>
+
+<div class="config-login-wrapper">
+  <div class="config-login-card">
+    <h2 class="config-login-title">Konfigurationsbrücke</h2>
+    <p class="config-login-sub">
+      Nur für die Kapitänin / den Kapitän des Pflegehilfsmittel-Kreuzers.
+    </p>
+
+    <p class="config-login-fun">
+      Bitte das geheime Passwort eingeben, bevor du an Ruder, Funk & Maschinenraum
+      (also die Einstellungen) darfst. 🛟
+    </p>
+
+    <form method="post" action="/config-login">
+      <div class="form-row">
+        <label for="cfg-pass">Passwort</label>
+        <input id="cfg-pass"
+               type="password"
+               name="password"
+               required
+               autocomplete="off"
+               placeholder="••••••••••••">
+      </div>
+
+      <button type="submit" class="btn-primary">
+        🔐 An Bord gehen
+      </button>
+
+      {% if error %}
+        <p class="error-text">{{ error }}</p>
+      {% endif %}
+
+      <p class="hint-line">
+        Tipp: Nur du kennst das Passwort – Besatzung und Passagiere kommen hier nicht hinein.
+      </p>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

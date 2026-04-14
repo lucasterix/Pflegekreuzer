@@ -1,0 +1,458 @@
+[
+    {
+      "name": "BKK Exklusiv",
+      "address": "31273 Lehrte, Zum Blauen See 7",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "182122557"
+    },
+    {
+      "name": "BKK Werra-Meissner",
+      "address": "Sudetenlandstraße 2a, 37269 Eschwege",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "185530126"
+    },
+    {
+      "name": "mhplus Betriebskrankenkasse (Ost)",
+      "address": "Franckstraße 8, 71636 Ludwigsburg (Württemberg)",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "188034508"
+    },
+    {
+        "name": "mhplus Betriebskrankenkasse",
+        "address": "Franckstraße 8, 71636 Ludwigsburg (Württemberg)",
+        "Datenannahmestelle": "BITMARCK GmbH",
+        "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+        "Datenannahmestelle_IK": "102109128",
+        "Kostenträger_IK": "188035612"
+    },
+    {
+      "name": "BKK Euregio",
+      "address": "Boos-Fremery-Straße 66, 52525 Heinsberg",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "184125509"
+    },
+    {
+      "name": "BKK Firmus",
+      "address": "Gottlieb-Daimler Str 11, 28237 Bremen",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "183121137"
+    },
+    {
+      "name": "BKK Linde",
+      "address": "Konrad-Adenauer-Ring 33, 65187 Wiesbaden",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "185821242"
+    },
+    {
+      "name": "Salus BKK",
+      "address": "Siemensstraﬂe 5a, 63263 Neu-Isenburg",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "185330168"
+    },
+    {
+        "name": "Salus BKK (Ost)",
+        "address": "Siemensstraﬂe 5a, 63263 Neu-Isenburg",
+        "Datenannahmestelle": "BITMARCK GmbH",
+        "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+        "Datenannahmestelle_IK": "102109128",
+        "Kostenträger_IK": "185321269"
+      },
+    {
+      "name": "Heimat Krankenkasse c/o Abrechnungszentrum Emmendingen",
+      "address": "79310 Emmendingen",
+      "Datenannahmestelle": "Abrechnungszentrum Emmendingen",
+      "Daten-E-Mail-Adresse": "inbox@tp5.arz-emmendingen.de",
+      "Datenannahmestelle_IK": "107436557",
+      "Kostenträger_IK": "183724238"
+    },
+    {
+        "name": "Heimat Krankenkasse (Ost) c/o Abrechnungszentrum Emmendingen",
+        "address": "79310 Emmendingen",
+        "Datenannahmestelle": "Abrechnungszentrum Emmendingen",
+        "Daten-E-Mail-Adresse": "inbox@tp5.arz-emmendingen.de",
+        "Datenannahmestelle_IK": "107436557",
+        "Kostenträger_IK": "183723896"
+    },
+    {
+      "name": "AOK Niedersachsen, c/o DAVASO GmbH",
+      "address": "04310 Leipzig",
+      "Daten-E-Mail-Adresse": "edi302@davaso.de",
+      "Kostenträger_IK": "182114819",
+      "Datenannahmestelle": "DAVSO GmbH",
+      "Datenannahmestelle_IK": "661430035"
+    },
+    {
+      "name": "Siemens-Betriebskrankenkasse, c/o DAVASO GmbH",
+      "address": "04310 Leipzig",
+      "Datenannahmestelle": "DAVSO GmbH",
+      "Daten-E-Mail-Adresse": "edi302@davaso.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "188433248"
+    },
+    {
+        "name": "Siemens-Betriebskrankenkasse (Ost), c/o DAVASO GmbH",
+        "address": "04310 Leipzig",
+        "Datenannahmestelle": "DAVSO GmbH",
+        "Daten-E-Mail-Adresse": "edi302@davaso.de",
+        "Datenannahmestelle_IK": "102109128",
+        "Kostenträger_IK": "188223858"
+    },
+    {
+      "name": "BKK Pfalz",
+      "address": "Lichtenbergerstraße 16, 67059 Ludwigshafen",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "186431652"
+    },
+    {
+      "name": "BKK Vivida",
+      "address": "Sachsenfeld 4, 20097 Hamburg",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "183121013"
+    },
+    {
+      "name": "KKH Kaufmännische Krankenkasse c/o Abrechnungszentrum Emmendingen",
+      "address": "Bundesstraße 6, 79312 Emmendingen",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "104593971",
+      "Kostenträger_IK": "182171012"
+    },
+    {
+      "name": "HEK Hanseatische Krankenkasse c/o DAVASO GmbH",
+      "address": "Sommerfelder Straße 120, 04316 Leipzig",
+      "Datenannahmestelle": "DAVSO GmbH",
+      "Daten-E-Mail-Adresse": "edi302@davaso.de",
+      "Datenannahmestelle_IK": "661430035",
+      "Kostenträger_IK": "181570104"
+    },
+    {
+      "name": "BKK Braun Aesculap",
+      "address": "Grüne Straße 1, 34212 Melsungen",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "185530422"
+    },
+    {
+      "name": "BKK SECURVITA",
+      "address": "Lübeckertordamm 1-3, 20099 Hamburg",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "181320032"     
+    },
+    {
+        "name": "BKK SECURVITA (Ost)",
+        "address": "Lübeckertordamm 1-3, 20099 Hamburg",
+        "Datenannahmestelle": "BITMARCK GmbH",
+        "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+        "Datenannahmestelle_IK": "102109128",
+        "Kostenträger_IK": "181320942"     
+    },
+    {
+      "name": "AOK Sachsen-Anhalt",
+      "address": "Postverteilungsnummer 16.30.11, Magdeburg",
+      "Datenannahmestelle": "Mobil ISC GmbH",
+      "Daten-E-Mail-Adresse": "da@dta.aok.de",
+      "Datenannahmestelle_IK": "101097008",
+      "Kostenträger_IK": "181097008"
+    },
+    {
+      "name": "R+V Betriebskrankenkasse c/o Abrechnungszentrum Emmendingen",
+      "address": "Bundesstraße 6, 79312 Emmendingen",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "185823040"
+    },
+    {
+        "name": "R+V Betriebskrankenkasse (Ost) c/o Abrechnungszentrum Emmendingen",
+        "address": "Bundesstraße 6, 79312 Emmendingen",
+        "Datenannahmestelle": "BITMARCK GmbH",
+        "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+        "Datenannahmestelle_IK": "102109128",
+        "Kostenträger_IK": "185823051"
+    },
+    {
+      "name": "IKK Classic Pflegekasse, c/o DAVASO GmbH",
+      "address": "Postfach 500761, 04304 Leipzig",
+      "Datenannahmestelle": "DAVSO GmbH",
+      "Daten-E-Mail-Adresse": "edi302@davaso.de",
+      "Datenannahmestelle_IK": "661430035",
+      "Kostenträger_IK": "181500154"
+    },
+    {
+        "name": "IKK Classic Pflegekasse (Ost), c/o DAVASO GmbH",
+        "address": "Postfach 500761, 04304 Leipzig",
+        "Datenannahmestelle": "DAVSO GmbH",
+        "Daten-E-Mail-Adresse": "edi302@davaso.de",
+        "Datenannahmestelle_IK": "661430035",
+        "Kostenträger_IK": "187202793"
+    },
+    {
+      "name": "BKK Provita",
+      "address": "Münchner Weg 5, 85232 Bergkirchen, Kreis Dachau",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",    
+      "Kostenträger_IK": "188591499"
+    },
+    {
+        "name": "BKK Provita (Ost)",
+        "address": "Münchner Weg 5, 85232 Bergkirchen, Kreis Dachau",
+        "Datenannahmestelle": "BITMARCK GmbH",
+        "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+        "Datenannahmestelle_IK": "102109128",    
+        "Kostenträger_IK": "188591503"
+      },
+    {
+      "name": "AOK Rheinland-Pfalz/Saarland",
+      "address": "Digitalisierungszentrum, Am Sender 1, 56070 Koblenz",
+      "Datenannahmestelle": "ITSCare GmbH",
+      "Daten-E-Mail-Adresse": "da@dta.aok.de",
+      "Datenannahmestelle_IK": "107310373",
+      "Kostenträger_IK": "187310373"
+    },
+    {
+      "name": "BKK 24",
+      "address": "Mainzer Str. 5, 55232 Alzey",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",     
+      "Kostenträger_IK": "182122660"
+    },
+    {
+        "name": "BKK 24 (Ost)",
+        "address": "Mainzer Str. 5, 55232 Alzey",
+        "Datenannahmestelle": "BITMARCK GmbH",
+        "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+        "Datenannahmestelle_IK": "102109128",     
+        "Kostenträger_IK": "182732316"
+    },
+    {
+      "name": "AOK Hessen, c/o DAVASO GmbH",
+      "address": "Otto-Schmidt-Str. 22, 04425 Taucha",
+      "Datenannahmestelle": "ITSCare GmbH",
+      "Daten-E-Mail-Adresse": "da@dta.aok.de",
+      "Datenannahmestelle_IK": "105313145",
+      "Kostenträger_IK": "185313145"
+    },
+    {
+      "name": "AOK Baden-Württemberg",
+      "address": "Presselstrasse 19, 70191 Stuttgart",
+      "Datenannahmestelle": "ITSCare GmbH",
+      "Daten-E-Mail-Adresse": "da@dta.aok.de",
+      "Datenannahmestelle_IK": "108018007",
+      "Kostenträger_IK": "186710503"
+    },
+    {
+      "name": "DLZ Hilfsmittel der AOK Bayern",
+      "address": "Markgrafenstraße 16, 95632 Wunsiedel ",
+      "Datenannahmestelle": "KubusIT eGbR",
+      "Daten-E-Mail-Adresse": "da@dta.aok.de",
+      "Datenannahmestelle_IK": "108310400",
+      "Kostenträger_IK": "188310400"
+    },
+    {
+      "name": "HKK c/o Abrechnungszentrum Emmendingen",
+      "address": "Bundesstraße 6, 79312 Emmendingen",
+      "Datenannahmestelle": "Abrechnungszentrum Emmendingen",
+      "Daten-E-Mail-Adresse": "inbox@tp5.arz-emmendingen.de",
+      "Datenannahmestelle_IK": "107436557",
+      "Kostenträger_IK": "183170002"
+    },
+    {
+      "name": "Novitas BKK",
+      "address": "Schifferstraße 92 -100, 47059 Duisburg",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "184491707"
+    },
+    {
+        "name": "Novitas BKK (Ost)",
+        "address": "Schifferstraße 92 -100, 47059 Duisburg",
+        "Datenannahmestelle": "BITMARCK GmbH",
+        "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+        "Datenannahmestelle_IK": "102109128",
+        "Kostenträger_IK": "184491718"
+    },
+    {
+      "name": "AOK PLUS (Sachsen) c/o Pflegehilfsmittel",
+      "address": "01058 Dresden",
+      "Datenannahmestelle": "KubusIT eGbR",
+      "Daten-E-Mail-Adresse": "da@dta.aok.de",
+      "Datenannahmestelle_IK": "107299005",
+      "Kostenträger_IK": "187299005"
+    },
+    {
+        "name": "AOK PLUS (Thüringen) c/o Pflegehilfsmittel",
+        "address": "98523 Suhl",
+        "Datenannahmestelle": "KubusIT eGbR",
+        "Daten-E-Mail-Adresse": "da@dta.aok.de",
+        "Datenannahmestelle_IK": "107299005",
+        "Kostenträger_IK": "185998018"
+    },
+    {
+      "name": "BKK Continentale",
+      "address": "Sengelmannstraße 120, 22335 Hamburg",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "183523440"
+    },
+    {
+      "name": "VIACTIV Pflegekasse",
+      "address": "VIACTIV Krankenkasse, c/o DAVASO GmbH, 04310 Leipzig",
+      "Daten-E-Mail-Adresse": "edi302@davaso.de",
+      "Datenannahmestelle": "DAVSO GmbH",
+      "Datenannahmestelle_IK": "661430035",
+      "Kostenträger_IK": "661430035"
+    },
+    {
+      "name": "Pronova BKK",
+      "address": "Brunckstraße 47, 67063 Ludwigshafen am Rhein",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "186492393"
+    },
+    {
+        "name": "Pronova BKK Ost",
+        "address": "Brunckstraße 47, 67063 Ludwigshafen am Rhein",
+        "Datenannahmestelle": "BITMARCK GmbH",
+        "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+        "Datenannahmestelle_IK": "102109128",
+        "Kostenträger_IK": "186492406"
+      },
+      {
+        "name": "BOSCH BKK",
+        "address": "Kruppstraße 19, 70469 Stuttgart",
+        "Datenannahmestelle": "BITMARCK GmbH",
+        "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+        "Datenannahmestelle_IK": "102109128",     
+        "Kostenträger_IK": "188036123"
+      },
+    {
+      "name": "BOSCH BKK (Ost)",
+      "address": "Kruppstraße 19, 70469 Stuttgart",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",     
+      "Kostenträger_IK": "188023388"
+    },
+    {
+      "name": "DeBeKa BKK",
+      "address": "Metternicher Feld 50, 56072 Koblenz am Rhein",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "186329225"
+    },
+    {
+        "name": "DeBeKa BKK (Ost)",
+        "address": "Metternicher Feld 50, 56072 Koblenz am Rhein",
+        "Datenannahmestelle": "BITMARCK GmbH",
+        "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+        "Datenannahmestelle_IK": "102109128",
+        "Kostenträger_IK": "186329236"
+      },
+    {
+      "name": "Bahn BKK",
+      "address": "Engelstraße 55, Münster",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",  
+      "Kostenträger_IK": "189938503"    
+    },
+    {
+        "name": "Bahn BKK Ost",
+        "address": "Engelstraße 55, Münster",
+        "Datenannahmestelle": "BITMARCK GmbH",
+        "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+        "Datenannahmestelle_IK": "102109128",  
+        "Kostenträger_IK": "189920569"    
+    },
+    {
+      "name": "Audi BKK",
+      "address": "Postfach 100160, Ingolstadt",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",  
+      "Kostenträger_IK": "188534160"
+    },
+    {
+        "name": "Audi BKK (Ost)",
+        "address": "Postfach 100160, Ingolstadt",
+        "Datenannahmestelle": "BITMARCK GmbH",
+        "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+        "Datenannahmestelle_IK": "102109128",  
+        "Kostenträger_IK": "188837428"
+    },
+    {
+      "name": "TK Techniker Krankenkasse",
+      "address": "Servicezentrum Pflegeleistungen, 22305 Hamburg",
+      "Datenannahmestelle": "T-Systems",
+      "Daten-E-Mail-Adresse": "dav01@b2b.mailorbit.de",
+      "Datenannahmestelle_IK": "109989162",
+      "Kostenträger_IK": "181575519"
+    },
+    {
+      "name": "Mobil Krankenkasse",
+      "Datenannahmestelle": "Mobil ISC GmbH",
+      "Daten-E-Mail-Adresse": "dav-service@mobil-isc.de",
+      "address": "Hühnerposten 2, 20097 Hamburg",
+      "Datenannahmestelle_IK": "102193212",
+      "Kostenträger_IK": "181520078"
+    },
+    {
+      "name": "Barmer c/o Pflegehilfsmittel",
+      "Datenannahmestelle": "DDG",
+      "Daten-E-Mail-Adresse": "dta302@ddg-online.de",
+      "address": "Scanzentrum, 42267 Wuppertal",
+      "Datenannahmestelle_IK": "660510336",
+      "Kostenträger_IK": "184940005"
+    },
+    {
+      "name": "DAK-Gesundheit c/o DAVASO GmbH",
+      "address": "04310 Leipzig",
+      "Datenannahmestelle": "DAVSO GmbH",
+      "Daten-E-Mail-Adresse":"edi302@davaso.de",
+      "Datenannahmestelle_IK": "661430035",
+      "Kostenträger_IK": "185830016"
+    },
+    {
+      "name": "BKK Technoform",
+      "address": "August-Spindler-Straße 1, 37079 Göttingen",
+      "Datenannahmestelle": "BITMARCK GmbH",
+      "Daten-E-Mail-Adresse": "le@bitmarck-daten.de",
+      "Datenannahmestelle_IK": "102109128",
+      "Kostenträger_IK": "182031410"
+    },
+    {
+      "name": "Test Kasse",
+      "address": "Bimbo Straße 11",
+      "Datenannahmestelle": "Backoffice",
+      "Daten-E-Mail-Adresse": "lucas.schmutz@froehlichdienste.de",
+      "Datenannahmestelle_IK": "104509321",
+      "Kostenträger_IK": "113911410"
+    }
+  ]

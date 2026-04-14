@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .page-header {
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:1rem;
+  }
+  .page-header h2 {
+    margin:0;
+    font-size:1.7rem;
+  }
+  .page-header small {
+    color:#4a5568;
+    font-size:0.9rem;
+  }
+
+  .card {
+    background:#ffffff;
+    border-radius:10px;
+    border:1px solid #e2e8f0;
+    padding:16px 18px;
+    box-shadow:0 2px 4px rgba(15,23,42,0.04);
+    margin-bottom:1.2rem;
+  }
+
+  .card h3 {
+    margin-top:0;
+    margin-bottom:0.4rem;
+    font-size:1.25rem;
+  }
+  .card-subtitle {
+    margin:0 0 1rem;
+    font-size:0.9rem;
+    color:#64748b;
+  }
+
+  .table-wrap {
+    margin-top:0.4rem;
+    overflow-x:auto;
+  }
+
+  table.archive-table {
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.9rem;
+  }
+  table.archive-table thead tr {
+    background:#f8fafc;
+  }
+  table.archive-table th,
+  table.archive-table td {
+    padding:8px 10px;
+    border-bottom:1px solid #e2e8f0;
+    text-align:left;
+  }
+  table.archive-table th {
+    font-weight:600;
+    color:#475569;
+    white-space:nowrap;
+  }
+  table.archive-table tbody tr:nth-child(even) {
+    background:#f9fafb;
+  }
+  table.archive-table tbody tr:hover {
+    background:#eff6ff;
+  }
+
+  .btn-secondary {
+    padding:6px 10px;
+    border-radius:999px;
+    background:#e5e7eb;
+    color:#111827;
+    border:1px solid #d1d5db;
+    font-size:0.85rem;
+    cursor:pointer;
+    text-decoration:none;
+  }
+  .btn-secondary:hover {
+    background:#d4d4d8;
+  }
+
+  .empty-hint {
+    font-size:0.95rem;
+    color:#6b7280;
+  }
+</style>
+
+<div class="page-header">
+  <div>
+    <h2>Archiv – Patienten</h2>
+    <small>Alle Patienten und deren historisch abgerechnete Monate.</small>
+  </div>
+</div>
+
+<section class="card">
+  <h3>Patientenarchiv</h3>
+  <p class="card-subtitle">
+    Wähle einen Patienten aus, um dessen Abrechnungsverlauf einzusehen.
+  </p>
+
+  {% if patients %}
+    <div class="table-wrap">
+      <table class="archive-table">
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Versichertennummer</th>
+            <th>Anzahl Abrechnungen</th>
+            <th>Zeitraum</th>
+            <th>Aktion</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for p in patients %}
+          {% set stats = stats_by_patient.get(p.id) %}
+          <tr>
+            <td>{{ p.name }}</td>
+            <td>{{ p.versichertennummer }}</td>
+            <td>{{ stats.anzahl if stats else 0 }}</td>
+            <td>
+              {% if stats %}
+                {{ stats.von }} – {{ stats.bis }}
+              {% else %}
+                –
+              {% endif %}
+            </td>
+            <td>
+              <a href="/archiv/{{ p.id }}" class="btn-secondary">
+                Archiv öffnen
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="empty-hint">Noch keine Abrechnungen vorhanden.</p>
+  {% endif %}
+</section>
+
+{% endblock %}

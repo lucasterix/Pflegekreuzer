@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .page-header {
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:1rem;
+  }
+  .page-header h2 {
+    margin:0;
+    font-size:1.7rem;
+  }
+  .page-header small {
+    color:#4a5568;
+    font-size:0.9rem;
+  }
+
+  .card {
+    background:#ffffff;
+    border-radius:10px;
+    border:1px solid #e2e8f0;
+    padding:16px 18px;
+    box-shadow:0 2px 4px rgba(15,23,42,0.04);
+  }
+
+  .card-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:0.6rem;
+  }
+
+  .card-header-title {
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+  }
+  .card-header-title h3 {
+    margin:0;
+    font-size:1.2rem;
+  }
+  .card-header-title small {
+    font-size:0.9rem;
+    color:#64748b;
+  }
+
+  .search-box {
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid #cbd5e1;
+    background:#f8fafc;
+    min-width:220px;
+  }
+  .search-box input {
+    border:none;
+    background:transparent;
+    outline:none;
+    font-size:0.9rem;
+    width:140px;
+  }
+
+  .table-wrap {
+    margin-top:0.4rem;
+    overflow-x:auto;
+  }
+
+  table.kassen-table {
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.92rem;
+  }
+  table.kassen-table thead tr {
+    background:#f8fafc;
+  }
+  table.kassen-table th,
+  table.kassen-table td {
+    padding:8px 10px;
+    border-bottom:1px solid #e2e8f0;
+    text-align:left;
+    vertical-align:top;
+  }
+  table.kassen-table th {
+    font-weight:600;
+    color:#475569;
+    white-space:nowrap;
+  }
+  table.kassen-table tbody tr:nth-child(even) {
+    background:#f9fafb;
+  }
+  table.kassen-table tbody tr:hover {
+    background:#eff6ff;
+  }
+
+  .cell-muted {
+    color:#6b7280;
+  }
+  .badge-ik {
+    display:inline-flex;
+    align-items:center;
+    padding:2px 7px;
+    border-radius:999px;
+    font-size:0.78rem;
+    background:#ecfdf3;
+    color:#166534;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  .cell-email a {
+    color:#2563eb;
+    text-decoration:none;
+  }
+  .cell-email a:hover {
+    text-decoration:underline;
+  }
+</style>
+
+<div class="page-header">
+  <div>
+    <h2>Kostenträger / Pflegekassen</h2>
+    <small>Alphabetisch sortiert – Eingabe &amp; Export sofort nutzbar.</small>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="card-header-title">
+      <h3>Übersicht aller Kostenträger</h3>
+      <small>Suche nach Name, Adresse oder IK.</small>
+    </div>
+
+    <div class="search-box">
+      <span style="font-size:0.9rem; color:#64748b;">🔍</span>
+      <input id="kassen-filter"
+             type="text"
+             placeholder="Filtern …">
+    </div>
+  </div>
+
+  {% if items %}
+    <div class="table-wrap">
+      <table class="kassen-table" id="kassen-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Adresse</th>
+            <th>IK</th>
+            <th>Datenannahmestelle</th>
+            <th>Annahmestelle E-Mail</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for k in items %}
+          <tr
+            data-filter-text="{{ (k.name ~ ' ' ~ (k.address or '') ~ ' ' ~ (k.ik or '') ~ ' ' ~ (k.annahmestelle or '') ~ ' ' ~ (k.annahmestelle_email or '')) | lower }}"
+          >
+            <td>{{ k.id }}</td>
+            <td>{{ k.name }}</td>
+            <td>{{ k.address or '-' }}</td>
+            <td>
+              {% if k.ik %}
+                <span class="badge-ik">{{ k.ik }}</span>
+              {% else %}
+                <span class="cell-muted">–</span>
+              {% endif %}
+            </td>
+
+            <!-- Annahmestelle Name -->
+            <td>
+              {% if k.annahmestelle %}
+                {{ k.annahmestelle }}
+              {% else %}
+                <span class="cell-muted">–</span>
+              {% endif %}
+            </td>
+
+            <!-- Annahmestelle E-Mail -->
+            <td class="cell-email">
+              {% if k.annahmestelle_email %}
+                <a href="mailto:{{ k.annahmestelle_email }}">{{ k.annahmestelle_email }}</a>
+              {% else %}
+                <span class="cell-muted">–</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p style="margin-top:0.5rem; color:#64748b;">
+      Keine Kostenträger gefunden.
+    </p>
+  {% endif %}
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("kassen-filter");
+  const rows  = Array.from(document.querySelectorAll("#kassen-table tbody tr"));
+
+  if (!input) return;
+
+  input.addEventListener("input", () => {
+    const q = input.value.trim().toLowerCase();
+    if (!q) {
+      rows.forEach(tr => tr.style.display = "");
+      return;
+    }
+    rows.forEach(tr => {
+      const txt = tr.dataset.filterText || "";
+      tr.style.display = txt.includes(q) ? "" : "none";
+    });
+  });
+});
+</script>
+
+{% endblock %}
