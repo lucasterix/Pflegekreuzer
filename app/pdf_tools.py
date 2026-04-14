@@ -323,7 +323,7 @@ PRODUCTS = {
     "Fingerlinge": {"qty": 100, "price": _D("5.00")},
     "Einmalhandschuhe": {"qty": 100, "price": _D("9.00")},
     "Medizinische Gesichtsmaske": {"qty": 50, "price": _D("6.00")},
-    "FFP2-Gesichtsmaske": {"qty": 20, "price": _D("6.50")},
+    "FFP2-Gesichtsmaske": {"qty": 20, "price": _D("13.00")},
     "Schutzservietten (Einmalgebrauch)": {"qty": 100, "price": _D("10.00")},
     "Schürzen (Einmalgebrauch)": {"qty": 10, "price": _D("11.00")},
     "Schürzen (Wiederverwendbar)": {"qty": 1, "price": _D("20.50")},

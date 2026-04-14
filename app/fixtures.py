@@ -50,7 +50,7 @@ PFLEGEHILFSMITTEL_DEFAULTS = {
 
     "FFP2-Gesichtsmaske": {
         "qty": 20,                           # dein Paket, Vertrag-Rechengröße 10 Stück
-        "price": Decimal("6.50"),            # 10 x 0,65 € lt. Vertrag
+        "price": Decimal("13.00"),           # aktualisierter Netto-Preis
         "positionsnummer": "54.99.01.5001",
         "kennzeichen": "00",
     },
@@ -59,13 +59,6 @@ PFLEGEHILFSMITTEL_DEFAULTS = {
         "qty": 100,
         "price": Decimal("10.00"),
         "positionsnummer": "54.99.01.4001",
-        "kennzeichen": "00",
-    },
-
-    "Schutzschürzen (Einmalgebrauch)": {
-        "qty": 10,
-        "price": Decimal("11.00"),           # dein Wert
-        "positionsnummer": "54.99.01.3001",
         "kennzeichen": "00",
     },
 

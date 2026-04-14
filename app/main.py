@@ -27,6 +27,14 @@ CONFIG_PASSWORD = "Einheitsfront1A+"
 AUTH_COOKIE_NAME = "cfg_auth"
 
 
+def _remove_obsolete_hilfsmittel(db):
+    obsolete_names = ["Schutzschürzen (Einmalgebrauch)"]
+    deleted = db.query(PflegeHilfsmittel).filter(PflegeHilfsmittel.bezeichnung.in_(obsolete_names)).delete(synchronize_session=False)
+    if deleted:
+        db.commit()
+        print(f"[SEED] Entfernte {deleted} veraltete Pflegehilfsmittel: {', '.join(obsolete_names)}")
+
+
 def seed_hilfsmittel():
     """
     Initiale Pflegehilfsmittel aus den Fixtures in die Datenbank schreiben,
@@ -34,6 +42,7 @@ def seed_hilfsmittel():
     """
     db = SessionLocal()
     try:
+        _remove_obsolete_hilfsmittel(db)
         count = db.query(PflegeHilfsmittel).count()
         if count == 0:
             print("[SEED] Leere Tabelle 'pflegehilfsmittel' – befülle aus Fixtures …")
