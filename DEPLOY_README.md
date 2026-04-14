@@ -4,6 +4,8 @@
 
 Dieses Repository verwendet GitHub Actions für automatisches Deployment auf den Hetzner-Server.
 
+### ✅ Setup abgeschlossen - Auto-Deploy aktiv!
+
 ### 📋 GitHub Secrets einrichten
 
 Gehe zu deinem GitHub Repository → Settings → Secrets and variables → Actions
