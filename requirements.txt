@@ -11,3 +11,4 @@ weasyprint
 email-validator
 Pillow
 python-dotenv
+lxml
