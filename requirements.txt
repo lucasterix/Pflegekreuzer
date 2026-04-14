@@ -12,3 +12,4 @@ email-validator
 Pillow
 python-dotenv
 lxml
+pdf2image
