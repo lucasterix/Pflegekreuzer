@@ -61,9 +61,16 @@ from ..config import (
     APP_LOGIN_PASSWORD,
     CONFIG_PASSWORD,
     APP_AUTH_COOKIE_NAME,
+    APP_AUTH_COOKIE_SECRET,
     AUTH_COOKIE_NAME,
+    CFG_AUTH_COOKIE_SECRET,
     SESSION_COOKIE_SECURE,
     SESSION_COOKIE_SAMESITE,
+)
+from ..auth import (
+    create_signed_cookie,
+    verify_signed_cookie,
+    verify_password,
 )
 
 # ==============================
@@ -710,12 +717,12 @@ async def login_submit(
     u = (username or "").strip()
     p = (password or "").strip()
 
-    if u == APP_LOGIN_USER and p == APP_LOGIN_PASSWORD:
+    if u == APP_LOGIN_USER and verify_password(p, APP_LOGIN_PASSWORD):
         resp = RedirectResponse(url="/", status_code=303)
-        # 8 Stunden gültig, sicherer Cookie
+        token = create_signed_cookie("ok", APP_AUTH_COOKIE_SECRET)
         resp.set_cookie(
             APP_AUTH_COOKIE_NAME,
-            "ok",
+            token,
             max_age=60 * 60 * 8,
             httponly=True,
             secure=SESSION_COOKIE_SECURE,
@@ -1056,11 +1063,12 @@ async def config_login_submit(
 ):
     pw = (password or "").strip()
 
-    if pw == CONFIG_PASSWORD:
+    if verify_password(pw, CONFIG_PASSWORD):
         resp = RedirectResponse(url="/config", status_code=303)
+        token = create_signed_cookie("ok", CFG_AUTH_COOKIE_SECRET)
         resp.set_cookie(
             AUTH_COOKIE_NAME,
-            "ok",
+            token,
             max_age=60 * 60 * 8,  # 8 Stunden
             httponly=True,
             secure=SESSION_COOKIE_SECURE,

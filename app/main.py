@@ -11,7 +11,13 @@ from .routes import ui
 from .routes.bank_import import router as bank_router
 from .fixtures import PFLEGEHILFSMITTEL_DEFAULTS
 from .ke0_import import import_ke0_directory
-from .config import APP_AUTH_COOKIE_NAME, AUTH_COOKIE_NAME
+from .config import (
+    APP_AUTH_COOKIE_NAME,
+    AUTH_COOKIE_NAME,
+    APP_AUTH_COOKIE_SECRET,
+    CFG_AUTH_COOKIE_SECRET,
+)
+from .auth import verify_signed_cookie
 
 
 # ==============================
@@ -90,14 +96,14 @@ async def auth_middleware(request: Request, call_next):
 
     # 2) Globaler App-Login (Cookie "app_auth")
     app_auth = request.cookies.get(APP_AUTH_COOKIE_NAME)
-    if app_auth != "ok":
+    if verify_signed_cookie(app_auth, APP_AUTH_COOKIE_SECRET) != "ok":
         # Noch nicht eingeloggt → auf /login
         return RedirectResponse(url="/login", status_code=303)
 
     # 3) Zusätzlicher Schutz für /config (separate Credentials)
     if path.startswith("/config"):
         cfg_auth = request.cookies.get(AUTH_COOKIE_NAME)
-        if cfg_auth != "ok":
+        if verify_signed_cookie(cfg_auth, CFG_AUTH_COOKIE_SECRET) != "ok":
             return RedirectResponse(url="/config-login", status_code=303)
 
     # 4) alles andere normal weiterreichen
