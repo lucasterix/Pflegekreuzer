@@ -7,6 +7,7 @@ from fastapi.responses import RedirectResponse
 from .db import Base, engine, SessionLocal
 from .models import hilfsmittel, kostentraeger, patient, abrechnung, settings  # noqa: F401
 from .models.hilfsmittel import PflegeHilfsmittel
+from .models.abrechnung import AbrechnungsPosition
 from .routes import ui, auth
 from .routes.bank_import import router as bank_router
 from .fixtures import PFLEGEHILFSMITTEL_DEFAULTS
@@ -28,6 +29,16 @@ from .auth import verify_signed_cookie
 
 def _remove_obsolete_hilfsmittel(db):
     obsolete_names = ["Schutzschürzen (Einmalgebrauch)"]
+
+    # Zuerst alle referenzierenden Abrechnungspositionen entfernen
+    for name in obsolete_names:
+        obsolete_item = db.query(PflegeHilfsmittel).filter(PflegeHilfsmittel.bezeichnung == name).first()
+        if obsolete_item:
+            deleted_positions = db.query(AbrechnungsPosition).filter(AbrechnungsPosition.hilfsmittel_id == obsolete_item.id).delete(synchronize_session=False)
+            if deleted_positions:
+                print(f"[SEED] Entfernte {deleted_positions} Abrechnungspositionen für veraltetes Hilfsmittel: {name}")
+
+    # Dann die Hilfsmittel selbst entfernen
     deleted = db.query(PflegeHilfsmittel).filter(PflegeHilfsmittel.bezeichnung.in_(obsolete_names)).delete(synchronize_session=False)
     if deleted:
         db.commit()
