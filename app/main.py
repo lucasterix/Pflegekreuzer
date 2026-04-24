@@ -9,7 +9,6 @@ from .models import hilfsmittel, kostentraeger, patient, abrechnung, settings  #
 from .models.hilfsmittel import PflegeHilfsmittel
 from .models.abrechnung import AbrechnungsPosition
 from .routes import ui, auth
-from .routes.bank_import import router as bank_router
 from .fixtures import PFLEGEHILFSMITTEL_DEFAULTS
 from .ke0_import import import_ke0_directory
 from .config import (
@@ -100,8 +99,7 @@ async def auth_middleware(request: Request, call_next):
         path.startswith("/login") or        # globale Login-Seite
         path.startswith("/config-login") or # Konfig-Login
         path.startswith("/docs") or         # Swagger, falls du es nutzen willst
-        path.startswith("/openapi.json") or   # OpenAPI
-        path.startswith("/api/bank/")
+        path.startswith("/openapi.json")    # OpenAPI
     ):
         return await call_next(request)
 
@@ -127,4 +125,3 @@ async def auth_middleware(request: Request, call_next):
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 app.include_router(auth.router)
 app.include_router(ui.router)
-app.include_router(bank_router)
